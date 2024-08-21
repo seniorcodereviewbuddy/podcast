@@ -1,6 +1,6 @@
 # Podcast
 
-This is a personal program I've developed over several years to handle my podcast routine/approach. 
+This is a personal program I've developed over several years to handle my podcast routine/approach.
 This program is responsible for managing the podcast files on my computer, and when requested to, copying
 them over to my android device.
 

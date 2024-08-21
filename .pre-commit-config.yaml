@@ -1,0 +1,26 @@
+ci:
+    autofix_prs: false
+    skip: [legacy_precommit]
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: check-ast
+    -   id: check-yaml
+    -   id: check-json
+    -   id: end-of-file-fixer
+    -   id: mixed-line-ending
+    -   id: pretty-format-json
+        args: [--autofix]
+    -   id: trailing-whitespace
+-   repo: local
+    hooks:
+    # TODO: Everything should be migrated out of this legacy precommit step.
+    -   id: legacy_precommit
+        name: legacy_precommit
+        entry: python pre-commit.py
+        language: system
+        always_run: true
+        pass_filenames: false
+        args: [--check]
