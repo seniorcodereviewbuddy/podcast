@@ -15,23 +15,23 @@ repos:
         args: [--autofix]
     -   id: trailing-whitespace
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.11.0
+    rev: 24.8.0
     hooks:
     -  id: black
 -   repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 7.1.1
     hooks:
     -   id: flake8
         # TODO: I think this is an old arg that can be deleted.
         args: ["--extend-exclude=*_pb2.py"]
 -   repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
     - id: isort
       name: isort (python)
       args: ["--profile", "black"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.11.1
     hooks:
     -   id: mypy
         args: ["--strict"]
