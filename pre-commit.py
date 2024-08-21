@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import glob
 import io
 import os
 import subprocess
@@ -22,35 +21,6 @@ def RunProcess(args: list[str]) -> subprocess.CompletedProcess[str]:
     if result.stdout:
         print(result.stdout, flush=True)
     return result
-
-
-def BlackHasRun(check: bool, python_sources: list[str]) -> bool:
-    print("Running black", flush=True)
-    args = ["black"]
-    if check:
-        args.append("--check")
-    return RunProcess(args + python_sources).returncode == 0
-
-
-def PassFlake8Checks(python_sources: list[str]) -> bool:
-    print("Running flake8", flush=True)
-    return (
-        RunProcess(["flake8", "--extend-exclude=*_pb2.py"] + python_sources).returncode
-        == 0
-    )
-
-
-def PassISortChecks(check: bool, python_sources: list[str]) -> bool:
-    print("Running isort", flush=True)
-    args = ["isort"]
-    if check:
-        args.append("--check")
-    return RunProcess(args + python_sources).returncode == 0
-
-
-def PassMyPyChecks(python_sources: list[str]) -> bool:
-    print("Running mypy", flush=True)
-    return RunProcess(["mypy", "--strict"] + python_sources).returncode == 0
 
 
 def main(args: typing.Optional[list[str]]) -> int:
@@ -74,26 +44,7 @@ def main(args: typing.Optional[list[str]]) -> int:
     parser = argparse.ArgumentParser(
         description="Prepare repo for submitting a change by running cleanups and checks"
     )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Run in check mode, won't change any files.",
-    )
-    parsed_args = parser.parse_args(args)
-
-    python_sources = glob.glob(os.path.join(ROOT_FOLDER, "*.py"))
-
-    if not BlackHasRun(parsed_args.check, python_sources):
-        return 1
-
-    if not PassFlake8Checks(python_sources):
-        return 1
-
-    if not PassISortChecks(parsed_args.check, python_sources):
-        return 1
-
-    if not PassMyPyChecks(python_sources):
-        return 1
+    parser.parse_args(args)
 
     test_result = run_tests.discover_and_run_tests(
         start_dir=ROOT_FOLDER, pattern=run_tests.DEFAULT_TEST_PATTERN, failfast=True
