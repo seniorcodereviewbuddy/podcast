@@ -8,26 +8,30 @@ import typing
 import helper
 
 
-def _MoveFileOverImpl(
+def _ArchiveFile(
+    file_source: pathlib.Path, archive_destination: pathlib.Path, dry_run: bool
+) -> None:
+    if not archive_destination:
+        return
+        
+    if dry_run:
+        print("Dry run, would have archived %s" % (file_source))
+    else:
+        os.makedirs(archive_destination.parent, exist_ok=True)
+        print(
+            "Making copy of %s in archive (%s)"
+            % (file_source.name, archive_destination)
+        )
+        shutil.copyfile(file_source, archive_destination)
+
+
+def _UpdateFileandMoveOver(
     file_source: pathlib.Path,
     file_destination: pathlib.Path,
-    archive_destination: pathlib.Path,
     title_prefix: str,
     speed: float,
     dry_run: bool,
 ) -> None:
-    # Make copies of important episodes.
-    if archive_destination:
-        if dry_run:
-            print("Dry run, would have archived %s" % (file_source))
-        else:
-            os.makedirs(archive_destination.parent, exist_ok=True)
-            print(
-                "Making copy of %s in archive (%s)"
-                % (file_source.name, archive_destination)
-            )
-            shutil.copyfile(file_source, archive_destination)
-
     album = file_source.parent.name
     if dry_run:
         print("Dry run, would have moved %s to %s" % (file_source, file_destination))
@@ -48,10 +52,13 @@ def main(args: typing.Optional[typing.List[str]]) -> None:
     parser.add_argument("--dry-run", action="store_true", default=False)
     parsed_args = parser.parse_args(args)
 
-    _MoveFileOverImpl(
+    _ArchiveFile(
+        parsed_args.file_path, parsed_args.archive_destination, parsed_args.dry_run
+    )
+
+    _UpdateFileandMoveOver(
         parsed_args.file_path,
         parsed_args.file_destination,
-        parsed_args.archive_destination,
         parsed_args.title_prefix,
         parsed_args.speed,
         parsed_args.dry_run,
