@@ -11,8 +11,6 @@ class TestMoveFile(unittest.TestCase):
     def setUp(self) -> None:
         self.holding_dir = tempfile.TemporaryDirectory()
 
-        self.podcast_show_name = "podcast_show"
-
         test_file_source = os.path.join(
             test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE
         )
@@ -30,7 +28,7 @@ class TestMoveFile(unittest.TestCase):
             self.destination, os.path.basename(self.podcast_file)
         )
         self.archived_podcast_path = os.path.join(
-            self.archive, self.podcast_show_name, os.path.basename(self.podcast_file)
+            self.archive, "fake_show_archive", os.path.basename(self.podcast_file)
         )
 
     def tearDown(self) -> None:
@@ -39,14 +37,12 @@ class TestMoveFile(unittest.TestCase):
     def testDryRunArchive(self) -> None:
         args = [
             "--dry-run",
-            "--archive-folder",
-            self.archive,
-            "--podcast-show-name",
-            self.podcast_show_name,
+            "--archive-destination",
+            self.archived_podcast_path,
             "--file-path",
             self.podcast_file,
-            "--destination",
-            self.destination,
+            "--file-destination",
+            self.destination_podcast_path,
         ]
         move_file.main(args)
         self.assertTrue(os.path.isfile(self.podcast_file))
@@ -56,12 +52,10 @@ class TestMoveFile(unittest.TestCase):
     def testDryRunNoArchive(self) -> None:
         args = [
             "--dry-run",
-            "--podcast-show-name",
-            self.podcast_show_name,
             "--file-path",
             self.podcast_file,
-            "--destination",
-            self.destination,
+            "--file-destination",
+            self.destination_podcast_path,
         ]
         move_file.main(args)
         self.assertTrue(os.path.isfile(self.podcast_file))
@@ -70,14 +64,12 @@ class TestMoveFile(unittest.TestCase):
 
     def testProdRunArchive(self) -> None:
         args = [
-            "--archive-folder",
-            self.archive,
-            "--podcast-show-name",
-            self.podcast_show_name,
+            "--archive-destination",
+            self.archived_podcast_path,
             "--file-path",
             self.podcast_file,
-            "--destination",
-            self.destination,
+            "--file-destination",
+            self.destination_podcast_path,
         ]
         move_file.main(args)
         self.assertFalse(os.path.isfile(self.podcast_file))
@@ -86,12 +78,10 @@ class TestMoveFile(unittest.TestCase):
 
     def testProdRunNoArchive(self) -> None:
         args = [
-            "--podcast-show-name",
-            self.podcast_show_name,
             "--file-path",
             self.podcast_file,
-            "--destination",
-            self.destination,
+            "--file-destination",
+            self.destination_podcast_path,
         ]
         move_file.main(args)
         self.assertFalse(os.path.isfile(self.podcast_file))

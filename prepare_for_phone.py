@@ -79,15 +79,18 @@ def ProcessAndMoveFilesOver(
         for file in files:
             q: queue.Queue[str] = queue.Queue()
             title_prefix = "%04d_" % (file.index) if file.index else ""
+            file_destination = pathlib.Path(destination, file.path.name)
             args = [
-                "--podcast-show-name=%s" % (file.podcast_show_name),
                 "--file-path=%s" % (file.path),
-                "--destination=%s" % destination,
+                "--file-destination=%s" % file_destination,
                 "--title-prefix=%s" % (title_prefix),
                 "--speed=%f" % (file.speed),
             ]
             if file.archive == archive.Archive.YES:
-                args += ["--archive-folder=%s" % (archive_folder)]
+                archive_destination = archive_folder.joinpath(
+                    file.podcast_show_name, file.path.name
+                )
+                args += ["--archive-destination=%s" % (archive_destination)]
             if dry_run:
                 args += ["--dry-run"]
             futures.append((file, q, executor.submit(work, q, args)))
