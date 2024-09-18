@@ -13,7 +13,7 @@ def _ArchiveFile(
 ) -> None:
     if not archive_destination:
         return
-        
+
     if dry_run:
         print("Dry run, would have archived %s" % (file_source))
     else:
