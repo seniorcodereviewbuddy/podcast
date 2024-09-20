@@ -28,18 +28,16 @@ def _ArchiveFile(
 def _UpdateFileandMoveOver(
     file_source: pathlib.Path,
     file_destination: pathlib.Path,
-    title_prefix: str,
+    title: str,
+    album: str,
     speed: float,
     dry_run: bool,
 ) -> None:
-    album = file_source.parent.name
     if dry_run:
         print("Dry run, would have moved %s to %s" % (file_source, file_destination))
         print("With album %s" % album)
     else:
-        helper.PrepareAudioAndMove(
-            file_source, file_destination, album, title_prefix, speed
-        )
+        helper.PrepareAudioAndMove(file_source, file_destination, title, album, speed)
 
 
 def main(args: typing.Optional[typing.List[str]]) -> None:
@@ -47,7 +45,8 @@ def main(args: typing.Optional[typing.List[str]]) -> None:
     parser.add_argument("--file-path", type=pathlib.Path, required=True)
     parser.add_argument("--file-destination", type=pathlib.Path, required=True)
     parser.add_argument("--archive-destination", type=pathlib.Path, default=None)
-    parser.add_argument("--title-prefix", type=str, default="")
+    parser.add_argument("--album", type=str, required=True)
+    parser.add_argument("--title", type=str, required=True)
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--dry-run", action="store_true", default=False)
     parsed_args = parser.parse_args(args)
@@ -59,7 +58,8 @@ def main(args: typing.Optional[typing.List[str]]) -> None:
     _UpdateFileandMoveOver(
         parsed_args.file_path,
         parsed_args.file_destination,
-        parsed_args.title_prefix,
+        parsed_args.title,
+        parsed_args.album,
         parsed_args.speed,
         parsed_args.dry_run,
     )

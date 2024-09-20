@@ -22,14 +22,12 @@ class TestHelper(unittest.TestCase):
         )
 
         helper.PrepareAudioAndMove(
-            full_path, final_full_path, "podcast album", "title_prefix: ", 1.0
+            full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
+        self.assertEqual("new_title", audio_metadata.GetTitle(final_full_path))
         self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
-        self.assertEqual(
-            "title_prefix: Test MP3", audio_metadata.GetTitle(final_full_path)
-        )
 
     def testListTitleAndAlbum(self) -> None:
         root = tempfile.mkdtemp()
@@ -44,15 +42,15 @@ class TestHelper(unittest.TestCase):
         )
 
         helper.PrepareAudioAndMove(
-            full_path, final_full_path, "podcast album", "title_prefix: ", 1.0
+            full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
         self.assertEqual(
-            "title_prefix: m4a test",
+            "new_title",
             audio_metadata.GetTitle(final_full_path),
         )
+        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
 
     def testListTitleAndAlbumAfterNoTitleOrAlbum(self) -> None:
         root = tempfile.mkdtemp()
@@ -67,15 +65,15 @@ class TestHelper(unittest.TestCase):
         )
 
         helper.PrepareAudioAndMove(
-            full_path, final_full_path, "podcast album", "title_prefix: ", 1.0
+            full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
         self.assertEqual(
-            "title_prefix: test.mp3",
+            "new_title",
             audio_metadata.GetTitle(final_full_path),
         )
+        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ import typing
 
 import android_phone
 import archive
+import audio_metadata
 import backup
 import full_podcast_episode
 import podcast_database
@@ -40,6 +41,14 @@ def FindUnknownFolders(
             unknown_folders.append(pathlib.Path(item.name))
 
     return unknown_folders
+
+
+def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
+    current_title = audio_metadata.GetTitle(file)
+    if current_title:
+        return title_prefix + current_title
+
+    return title_prefix + os.path.basename(file)
 
 
 def ProcessAndMoveFilesOver(
@@ -78,12 +87,18 @@ def ProcessAndMoveFilesOver(
         futures = []
         for file in files:
             q: queue.Queue[str] = queue.Queue()
+
             title_prefix = "%04d_" % (file.index) if file.index else ""
+            title = _GenerateTitle(file.path, title_prefix)
+
+            album = file.path.parent.name
+
             file_destination = pathlib.Path(destination, file.path.name)
             args = [
                 "--file-path=%s" % (file.path),
                 "--file-destination=%s" % file_destination,
-                "--title-prefix=%s" % (title_prefix),
+                "--title=%s" % (title),
+                "--album=%s" % (album),
                 "--speed=%f" % (file.speed),
             ]
             if file.archive == archive.Archive.YES:

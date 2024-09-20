@@ -7,16 +7,8 @@ import audio_metadata
 import conversions
 
 
-def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
-    current_title = audio_metadata.GetTitle(file)
-    if current_title:
-        return title_prefix + current_title
-
-    return title_prefix + os.path.basename(file)
-
-
 def PrepareAudioAndMove(
-    file: pathlib.Path, dest: pathlib.Path, album: str, title_prefix: str, speed: float
+    file: pathlib.Path, dest: pathlib.Path, title: str, album: str, speed: float
 ) -> None:
     print("Preparing Audio file %s" % file)
 
@@ -24,8 +16,7 @@ def PrepareAudioAndMove(
         working_copy = pathlib.Path(tmpdir, file.name)
         conversions.CreateAdjustedPodcastForPlayback(file, working_copy, speed)
 
-        new_title = _GenerateTitle(file, title_prefix)
-        audio_metadata.SetMetadata(working_copy, title=new_title, album=album)
+        audio_metadata.SetMetadata(working_copy, title=title, album=album)
 
         # We don't copy the file to the destination until all the processing is
         # done to prevent the output folder from having incomplete files, or
