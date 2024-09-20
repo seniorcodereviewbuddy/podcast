@@ -4,7 +4,7 @@ import re
 import subprocess
 import typing
 
-import helper
+import audio_metadata
 import podcast_episode
 import user_input
 
@@ -60,8 +60,8 @@ class AndroidPhone(object):
             )
             for file in files:
                 filename = file.name
-                podcast = helper.GetAlbum(file)
-                title = helper.GetTitle(file)
+                podcast = audio_metadata.GetAlbum(file)
+                title = audio_metadata.GetTitle(file)
                 modified_time = podcast_episode.ModifiedTime(file)
                 readable_modified_time = datetime.datetime.fromtimestamp(
                     modified_time, tz=datetime.timezone.utc
