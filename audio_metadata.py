@@ -1,6 +1,7 @@
 import pathlib
+import typing
 
-from mutagen.id3 import ID3, ID3NoHeaderError  # type: ignore
+from mutagen.id3 import ID3, TALB, TIT2, ID3NoHeaderError  # type: ignore
 from mutagen.mp4 import MP4
 
 MP3_ID3_ALBUM_TAG = "TALB"
@@ -10,6 +11,10 @@ M4A_TITLE_TAG = "\xa9nam"
 
 NO_TITLE_FOUND = ""
 NO_ALBUM_FOUND = "(No Album Name Found)"
+
+
+class FileTypeError(Exception):
+    pass
 
 
 def _GetAlbumFromMP3(file: pathlib.Path) -> str:
@@ -63,3 +68,36 @@ def GetTitle(file: pathlib.Path) -> str:
         return str(current_title)
 
     raise Exception("Unhandled filetype, path %s" % file)
+
+
+def SetMetadata(
+    file: pathlib.Path,
+    title: typing.Optional[str] = None,
+    album: typing.Optional[str] = None,
+) -> None:
+    ext = file.suffix.lower()
+    if ext == ".mp3":
+        try:
+            tags = ID3(str(file))  # type: ignore
+        except ID3NoHeaderError:
+            tags = ID3()  # type: ignore
+
+        if title:
+            tags[MP3_ID3_TITLE_TAG] = TIT2(encoding=3, text=title)  # type: ignore
+
+        if album:
+            tags[MP3_ID3_ALBUM_TAG] = TALB(encoding=3, text=album)  # type: ignore
+
+        tags.save(file)
+    elif ext == ".m4a":
+        m4a_file = MP4(str(file))  # type: ignore
+
+        if title:
+            m4a_file[M4A_TITLE_TAG] = title
+
+        if album:
+            m4a_file[M4A_ALBUM_TAG] = album
+
+        m4a_file.save()  # type: ignore
+    else:
+        raise FileTypeError("Unhandled filetype, path %s" % file)
