@@ -18,7 +18,7 @@ def _GetAlbumFromMP3(file: pathlib.Path) -> str:
     except ID3NoHeaderError:
         tags = ID3()  # type: ignore
     if MP3_ID3_ALBUM_TAG not in tags:
-        return "(No Album Name Found)"
+        return NO_ALBUM_FOUND
     album = tags[MP3_ID3_ALBUM_TAG].text
     assert isinstance(album, list), "album expected to be returned as list"
     return str(album[0])
