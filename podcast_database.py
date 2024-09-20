@@ -4,8 +4,8 @@ import random
 import typing
 
 import full_podcast_episode
-import helper
 import podcast_show
+import time_helper
 import user_input
 
 
@@ -148,7 +148,7 @@ class PodcastDatabase(object):
                 % (
                     date.strftime("%Y-%m-%d %H:%M:%S"),
                     num_remaining_episodes,
-                    helper.SecondsToString(remaining_duration),
+                    time_helper.SecondsToString(remaining_duration),
                 )
             )
 
@@ -170,9 +170,9 @@ class PodcastDatabase(object):
                     "%s: total duration of %s, %d episodes, %s long on average\n"
                     % (
                         x.podcast_folder,
-                        helper.SecondsToString(total_duration),
+                        time_helper.SecondsToString(total_duration),
                         len(remaining_episodes),
-                        helper.SecondsToString(average_duration),
+                        time_helper.SecondsToString(average_duration),
                     )
                 )
 

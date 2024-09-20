@@ -4,7 +4,7 @@ import typing
 
 import pyglet
 
-import helper
+import time_helper
 
 
 class PodcastEpisodeLoadingException(Exception):
@@ -42,7 +42,7 @@ class PodcastEpisode(object):
         self.modification_time = modification_time
 
     def __str__(self) -> str:
-        return "%s:(%s)" % (self.path, helper.SecondsToString(self.duration))
+        return "%s:(%s)" % (self.path, time_helper.SecondsToString(self.duration))
 
     @classmethod
     def New(cls, path: pathlib.Path, index: int) -> "PodcastEpisode":
