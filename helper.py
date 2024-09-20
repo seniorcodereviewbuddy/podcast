@@ -1,11 +1,10 @@
-import math
 import os
 import pathlib
 import shutil
 import tempfile
 
 import audio_metadata
-import ffmpeg_helper
+import conversions
 
 
 def SecondsToString(seconds: float) -> str:
@@ -40,24 +39,20 @@ def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
 def PrepareAudioAndMove(
     file: pathlib.Path, dest: pathlib.Path, album: str, title_prefix: str, speed: float
 ) -> None:
-    tmpdir = tempfile.TemporaryDirectory()
-    copy1 = pathlib.Path(tmpdir.name, file.name)
-    shutil.copyfile(file, copy1)
-
     print("Preparing Audio file %s" % file)
-    new_title = _GenerateTitle(file, title_prefix)
-    audio_metadata.SetMetadata(copy1, title=new_title, album=album)
 
-    stream = ffmpeg_helper.ffmpeg.input(str(copy1))
-    stream = ffmpeg_helper.ffmpeg.filter(stream, filter_name="loudnorm", i=-10.0)
-    if not math.isclose(1.0, speed):
-        stream = ffmpeg_helper.ffmpeg.filter(stream, filter_name="atempo", tempo=speed)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        working_copy = pathlib.Path(tmpdir, file.name)
+        conversions.CreateAdjustedPodcastForPlayback(file, working_copy, speed)
 
-    copy2 = pathlib.Path(tmpdir.name, "2-" + file.name)
-    stream = ffmpeg_helper.ffmpeg.output(stream, str(copy2))
-    ffmpeg_helper.ffmpeg.run(stream, cmd=ffmpeg_helper.FFMPEG_EXE)
+        new_title = _GenerateTitle(file, title_prefix)
+        audio_metadata.SetMetadata(working_copy, title=new_title, album=album)
 
-    print("Moving %s to %s" % (file, dest))
-    shutil.move(copy2, dest)
-    os.remove(file)
+        # We don't copy the file to the destination until all the processing is
+        # done to prevent the output folder from having incomplete files, or
+        # files that are still being processed.
+        print("Moving %s to %s" % (file, dest))
+        shutil.move(working_copy, dest)
+        os.remove(file)
+
     print("Done")
