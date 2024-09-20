@@ -75,6 +75,10 @@ def SetMetadata(
     title: typing.Optional[str] = None,
     album: typing.Optional[str] = None,
 ) -> None:
+    # If no values were provided, we can jsut return early.
+    if not title and not album:
+        return
+
     ext = file.suffix.lower()
     if ext == ".mp3":
         try:
@@ -89,6 +93,7 @@ def SetMetadata(
             tags[MP3_ID3_ALBUM_TAG] = TALB(encoding=3, text=album)  # type: ignore
 
         tags.save(file)
+
     elif ext == ".m4a":
         m4a_file = MP4(str(file))  # type: ignore
 
@@ -99,5 +104,6 @@ def SetMetadata(
             m4a_file[M4A_ALBUM_TAG] = album
 
         m4a_file.save()  # type: ignore
+
     else:
         raise FileTypeError("Unhandled filetype, path %s" % file)

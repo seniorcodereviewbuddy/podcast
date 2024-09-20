@@ -162,7 +162,7 @@ class TestAudioMetadata(unittest.TestCase):
             full_path.touch()
 
             with self.assertRaises(audio_metadata.FileTypeError):
-                audio_metadata.SetMetadata(full_path)
+                audio_metadata.SetMetadata(full_path, title="new_title")
 
 
 if __name__ == "__main__":
