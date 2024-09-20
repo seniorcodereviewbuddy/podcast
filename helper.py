@@ -32,6 +32,14 @@ def SecondsToString(seconds: float) -> str:
     return duration_string
 
 
+def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
+    current_title = audio_metadata.GetTitle(file)
+    if current_title:
+        return title_prefix + current_title
+
+    return title_prefix + os.path.basename(file)
+
+
 def PrepareAudioAndMove(
     file: pathlib.Path, dest: pathlib.Path, album: str, title_prefix: str, speed: float
 ) -> None:
@@ -48,26 +56,13 @@ def PrepareAudioAndMove(
             tags = ID3()  # type: ignore
         tags[audio_metadata.MP3_ID3_ALBUM_TAG] = TALB(encoding=3, text=album)  # type: ignore
 
-        current_title = audio_metadata.GetTitle(file)
-        if current_title:
-            tags[audio_metadata.MP3_ID3_TITLE_TAG] = TIT2(encoding=3, text=title_prefix + current_title)  # type: ignore
-        else:
-            tags[audio_metadata.MP3_ID3_TITLE_TAG] = TIT2(encoding=3, text=title_prefix + os.path.basename(file))  # type: ignore
-
+        new_title = _GenerateTitle(file, title_prefix)
+        tags[audio_metadata.MP3_ID3_TITLE_TAG] = TIT2(encoding=3, text=new_title)  # type: ignore
         tags.save(copy1)
     elif ext == ".m4a":
         m4a_file = MP4(str(copy1))  # type: ignore
         m4a_file[audio_metadata.M4A_ALBUM_TAG] = album
-
-        current_title = audio_metadata.GetTitle(file)
-        if current_title:
-            if isinstance(current_title, list):
-                current_title = current_title[0]
-            m4a_file[audio_metadata.M4A_TITLE_TAG] = title_prefix + current_title
-        else:
-            m4a_file[audio_metadata.M4A_TITLE_TAG] = title_prefix + os.path.basename(
-                file
-            )
+        m4a_file[audio_metadata.M4A_TITLE_TAG] = _GenerateTitle(file, title_prefix)
         m4a_file.save()  # type: ignore
     else:
         raise Exception("Unhandled filetype, path %s" % file)
