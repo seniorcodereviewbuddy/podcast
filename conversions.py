@@ -2,9 +2,23 @@ import math
 import os
 import pathlib
 
-import ffmpeg_helper
+import ffmpeg
+
+FFMPEG_EXE = "ffmpeg.exe"
 
 LOUDNESS_TARGET = -10.0
+
+
+def _ConvertFile(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
+    print("Converting %s to %s" % (input_file, output_file))
+    stream = ffmpeg.input(str(input_file))
+    stream = ffmpeg.output(stream, str(output_file))
+    ffmpeg.run(stream, cmd=FFMPEG_EXE)
+
+    # No need to keep the original file around now as it's been converted.
+    os.remove(input_file)
+
+    print("Done conversion")
 
 
 def ConvertMatchingFileTypesInFolder(
@@ -13,20 +27,16 @@ def ConvertMatchingFileTypesInFolder(
     for file in folder.iterdir():
         ext = file.suffix.lower()
         if ext.lower() == input_file_type:
-            ffmpeg_helper.ConvertFile(file, file.with_suffix(output_file_type))
-            # No need to keep the original file around now.
-            os.remove(file)
+            _ConvertFile(file, file.with_suffix(output_file_type))
 
 
 def CreateAdjustedPodcastForPlayback(
     input_file: pathlib.Path, output_file: pathlib.Path, speed: float
 ) -> None:
-    stream = ffmpeg_helper.ffmpeg.input(str(input_file))
-    stream = ffmpeg_helper.ffmpeg.filter(
-        stream, filter_name="loudnorm", i=LOUDNESS_TARGET
-    )
+    stream = ffmpeg.input(str(input_file))
+    stream = ffmpeg.filter(stream, filter_name="loudnorm", i=LOUDNESS_TARGET)
     if not math.isclose(1.0, speed):
-        stream = ffmpeg_helper.ffmpeg.filter(stream, filter_name="atempo", tempo=speed)
+        stream = ffmpeg.filter(stream, filter_name="atempo", tempo=speed)
 
-    stream = ffmpeg_helper.ffmpeg.output(stream, str(output_file))
-    ffmpeg_helper.ffmpeg.run(stream, cmd=ffmpeg_helper.FFMPEG_EXE)
+    stream = ffmpeg.output(stream, str(output_file))
+    ffmpeg.run(stream, cmd=FFMPEG_EXE)
