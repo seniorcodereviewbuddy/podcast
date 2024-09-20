@@ -4,9 +4,6 @@ import pathlib
 import shutil
 import tempfile
 
-from mutagen.id3 import ID3, TALB, TIT2, ID3NoHeaderError  # type: ignore
-from mutagen.mp4 import MP4
-
 import audio_metadata
 import ffmpeg_helper
 
@@ -48,24 +45,8 @@ def PrepareAudioAndMove(
     shutil.copyfile(file, copy1)
 
     print("Preparing Audio file %s" % file)
-    ext = copy1.suffix.lower()
-    if ext == ".mp3":
-        try:
-            tags = ID3(str(copy1))  # type: ignore
-        except ID3NoHeaderError:
-            tags = ID3()  # type: ignore
-        tags[audio_metadata.MP3_ID3_ALBUM_TAG] = TALB(encoding=3, text=album)  # type: ignore
-
-        new_title = _GenerateTitle(file, title_prefix)
-        tags[audio_metadata.MP3_ID3_TITLE_TAG] = TIT2(encoding=3, text=new_title)  # type: ignore
-        tags.save(copy1)
-    elif ext == ".m4a":
-        m4a_file = MP4(str(copy1))  # type: ignore
-        m4a_file[audio_metadata.M4A_ALBUM_TAG] = album
-        m4a_file[audio_metadata.M4A_TITLE_TAG] = _GenerateTitle(file, title_prefix)
-        m4a_file.save()  # type: ignore
-    else:
-        raise Exception("Unhandled filetype, path %s" % file)
+    new_title = _GenerateTitle(file, title_prefix)
+    audio_metadata.SetMetadata(copy1, title=new_title, album=album)
 
     stream = ffmpeg_helper.ffmpeg.input(str(copy1))
     stream = ffmpeg_helper.ffmpeg.filter(stream, filter_name="loudnorm", i=-10.0)
