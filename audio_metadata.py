@@ -75,7 +75,7 @@ def SetMetadata(
     title: typing.Optional[str] = None,
     album: typing.Optional[str] = None,
 ) -> None:
-    # If no values were provided, we can jsut return early.
+    # If no values were provided, we can just return early.
     if not title and not album:
         return
 
