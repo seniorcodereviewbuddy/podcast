@@ -131,17 +131,17 @@ class TestAndroidPhone(unittest.TestCase):
             )
 
     @mock.patch("subprocess.run")
-    def test_copy_files_to_phone_odd__file__encoding(self, mock_run: mock.Mock) -> None:
+    def test_copy_files_to_phone_odd_file_encoding(self, mock_run: mock.Mock) -> None:
         podcast_episodes = [
             pathlib.Path(self.holding_dir, test_utils.MP3_DIFFERENT_TITLE_ENCODING),
             pathlib.Path(self.holding_dir, test_utils.M4A_DIFFERENT_TITLE_ENCODING),
         ]
 
         for podcast_episode in podcast_episodes:
-            test__file__source = pathlib.Path(
+            test_file_source = pathlib.Path(
                 test_utils.TEST_DATA_DIR, podcast_episode.name
             )
-            shutil.copyfile(test__file__source, podcast_episode)
+            shutil.copyfile(test_file_source, podcast_episode)
 
         mock_run.return_value = MockProcess("Success", 0)
 

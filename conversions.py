@@ -21,13 +21,13 @@ def _convert_file(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
     print("Done conversion")
 
 
-def convert_matching__file__types_in_folder(
-    folder: pathlib.Path, input__file__type: str, output__file__type: str
+def convert_matching_file_types_in_folder(
+    folder: pathlib.Path, input_file_type: str, output_file_type: str
 ) -> None:
     for file in folder.iterdir():
         ext = file.suffix.lower()
-        if ext.lower() == input__file__type:
-            _convert_file(file, file.with_suffix(output__file__type))
+        if ext.lower() == input_file_type:
+            _convert_file(file, file.with_suffix(output_file_type))
 
 
 def create_adjusted_podcast_for_playback(

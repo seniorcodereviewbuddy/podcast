@@ -34,7 +34,7 @@ class TestSettings(unittest.TestCase):
             self.assertEqual(pathlib.Path("D:\\Podcasts"), user_settings.podcast_folder)
             self.assertEqual(
                 pathlib.Path("D:\\Podcasts\\Add to Phone"),
-                user_settings.processed__file__boarding_zone_folder,
+                user_settings.processed_file_boarding_zone_folder,
             )
             self.assertEqual(
                 pathlib.Path("D:\\Podcasts\\Archive"), user_settings.archive_folder
@@ -45,7 +45,7 @@ class TestSettings(unittest.TestCase):
             self.assertEqual(1, user_settings.num_oldest_episodes_to_add)
             self.assertEqual(10, user_settings.time_of_podcasts_to_add_in_hours)
 
-    def test_settings__file__missing_key(self) -> None:
+    def test_settings_file_missing_key(self) -> None:
         for key in self._default_settings.keys():
             with self.subTest(key=key):
                 with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
@@ -59,7 +59,7 @@ class TestSettings(unittest.TestCase):
                     ):
                         settings.DefaultSettings(pathlib.Path(f.name))
 
-    def test_settings__file__invalid_types_for_expected_integers(self) -> None:
+    def test_settings_file_invalid_types_for_expected_integers(self) -> None:
         for key in settings.Settings._EXPECTED_INT:
             with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
                 invalid_settings = self._default_settings.copy()

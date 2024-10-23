@@ -119,10 +119,8 @@ class TestE2E(unittest.TestCase):
         show_files = []
         for x in range(num_episodes):
             test_file = test_files[x % len(test_files)]
-            new__file__name = (
-                file_prefix + test_file.stem + str(x + 1) + test_file.suffix
-            )
-            copied_file = pathlib.Path(podcast_folder, new__file__name)
+            new_file_name = file_prefix + test_file.stem + str(x + 1) + test_file.suffix
+            copied_file = pathlib.Path(podcast_folder, new_file_name)
             show_files.append(copied_file)
 
             shutil.copyfile(
@@ -205,7 +203,7 @@ class TestE2E(unittest.TestCase):
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
     @mock.patch("builtins.input")
-    def test_full_end_to_end_test_with_show_copy_to_phone_one__file__two_phones_active(
+    def test_full_end_to_end_test_with_show_copy_to_phone_one_file_two_phones_active(
         self, user_input: mock.Mock
     ) -> None:
         # Create another android emulator on a different port.

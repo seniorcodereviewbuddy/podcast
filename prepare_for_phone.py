@@ -242,7 +242,7 @@ def main(
 
     result = user_input.prompt_yes_or_no(
         "Process files and move to '%s' before putting on phone: "
-        % user_settings.processed__file__boarding_zone_folder
+        % user_settings.processed_file_boarding_zone_folder
     )
 
     if not result:
@@ -250,12 +250,12 @@ def main(
         return
 
     # TODO: Raise an exception if it exists and is a file?
-    if not user_settings.processed__file__boarding_zone_folder.exists():
-        os.mkdir(user_settings.processed__file__boarding_zone_folder)
+    if not user_settings.processed_file_boarding_zone_folder.exists():
+        os.mkdir(user_settings.processed_file_boarding_zone_folder)
 
     process_and_move_files_over(
         unprocessed_files,
-        user_settings.processed__file__boarding_zone_folder,
+        user_settings.processed_file_boarding_zone_folder,
         user_settings.archive_folder,
         parsed_args.dry_run,
     )
@@ -263,7 +263,7 @@ def main(
     if phone.connected_to_phone():
         processed_files = [
             pathlib.Path(
-                user_settings.processed__file__boarding_zone_folder,
+                user_settings.processed_file_boarding_zone_folder,
                 podcast.path.name,
             )
             for podcast in unprocessed_files
@@ -279,7 +279,7 @@ def main(
                 f"WARNING: NOT ADDING {len(copy_results.failed_to_copy)} FILES TO BACKUP"
             )
             print(
-                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.processed__file__boarding_zone_folder}"
+                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.processed_file_boarding_zone_folder}"
             )
         local_backup.move_files_to_backup(copy_results.copied)
 

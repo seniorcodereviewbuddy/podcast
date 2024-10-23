@@ -542,7 +542,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
         self.assertCountEqual(files, oldest_episodes)
 
-    def test_get_batchof_podcast_files_specified__file__missing(self) -> None:
+    def test_get_batchof_podcast_files_specified_file_missing(self) -> None:
         show_path = pathlib.Path(self.root, "podcast_show")
         show = self._create_podcast_show(
             show_path, podcast_show.P2, 4, episodes_start_time=3000
