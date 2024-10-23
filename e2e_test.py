@@ -309,13 +309,13 @@ class TestE2E(unittest.TestCase):
     def testFullEndToEndTest_WithShow_CopyToPhone_MultipleTimes(
         self, user_input: mock.Mock
     ) -> None:
-        TIMES_TO_RUN = 5
+        times_to_run = 5
         user_input.side_effect = [
             # Initial for show 1.
             "Y",
             # Copy Files?
             "Y",
-        ] * TIMES_TO_RUN
+        ] * times_to_run
 
         podcast_folder = pathlib.Path(self.root.name, "Podcasts")
         podcast_folder.mkdir()
@@ -336,7 +336,7 @@ class TestE2E(unittest.TestCase):
             hours_to_add=0,
         )
 
-        for run_count in range(TIMES_TO_RUN):
+        for run_count in range(times_to_run):
             prepare_for_phone.main(args, test_settings)
 
             # Since we only add 1 file per run, we should have run_count + 1 files.

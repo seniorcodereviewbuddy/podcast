@@ -72,15 +72,15 @@ class PodcastDatabase(object):
                         break
 
                 if not match_found:
-                    REMOVE_KEYWORD = "REMOVE"
-                    NO_MATCH_FOUND_MESSAGE = (
+                    remove_keyword = "REMOVE"
+                    no_match_found_message = (
                         "No match found for %s. Please type %s if you want to remove this podcast:\n"
-                        % (podcast_folder, REMOVE_KEYWORD)
+                        % (podcast_folder, remove_keyword)
                     )
                     no_match_found_user_response = user_input_function(
-                        NO_MATCH_FOUND_MESSAGE
+                        no_match_found_message
                     )
-                    if no_match_found_user_response == REMOVE_KEYWORD:
+                    if no_match_found_user_response == remove_keyword:
                         # Since this removed podcast is still in the database file, we load it to parse it from the file, but
                         # then don't save this data anywhere since we no longer want it.
                         podcast_show.PodcastShow(

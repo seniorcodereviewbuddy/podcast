@@ -5,6 +5,7 @@ import typing
 import unittest
 
 DEFAULT_TEST_PATTERN = "*_test.py"
+ROOT_FOLDER = os.path.dirname(__file__)
 
 
 def discover_and_run_tests(start_dir: str, pattern: str, failfast: bool) -> int:
@@ -16,8 +17,6 @@ def discover_and_run_tests(start_dir: str, pattern: str, failfast: bool) -> int:
 
 
 def main(args: typing.Optional[list[str]]) -> int:
-    ROOT_FOLDER = os.path.dirname(__file__)
-
     parser = argparse.ArgumentParser(
         description="Helper script to run unit tests",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
