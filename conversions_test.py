@@ -34,7 +34,7 @@ class TestConversions(unittest.TestCase):
     def test_ConvertMatchingFileTypesInFolder_MP4sToMP3s(self) -> None:
         files = self.CreateTestFileCopies(test_utils.MP4_TEST_FILE)
 
-        conversions.ConvertMatchingFileTypesInFolder(
+        conversions.convert_matching_file_types_in_folder(
             pathlib.Path(self.tempdir.name), ".mp4", ".mp3"
         )
 
@@ -45,7 +45,7 @@ class TestConversions(unittest.TestCase):
     def test_ConvertMatchingFileTypesInFolder_WebmToM4A(self) -> None:
         files = self.CreateTestFileCopies(test_utils.WEBM_TEST_FILE)
 
-        conversions.ConvertMatchingFileTypesInFolder(
+        conversions.convert_matching_file_types_in_folder(
             pathlib.Path(self.tempdir.name), ".webm", ".mp3"
         )
 
@@ -64,7 +64,7 @@ class TestConversions(unittest.TestCase):
             unmatching_file,
         )
 
-        conversions.ConvertMatchingFileTypesInFolder(
+        conversions.convert_matching_file_types_in_folder(
             pathlib.Path(self.tempdir.name), ".webm", ".mp3"
         )
 
@@ -79,7 +79,7 @@ class TestConversions(unittest.TestCase):
     def test_ConvertMatchingFileTypesInFolder_NoMatches(self) -> None:
         files = self.CreateTestFileCopies(test_utils.MP4_TEST_FILE)
 
-        conversions.ConvertMatchingFileTypesInFolder(
+        conversions.convert_matching_file_types_in_folder(
             pathlib.Path(self.tempdir.name), ".webm", ".mp3"
         )
 

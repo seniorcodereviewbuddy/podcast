@@ -21,7 +21,7 @@ def _ConvertFile(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
     print("Done conversion")
 
 
-def ConvertMatchingFileTypesInFolder(
+def convert_matching_file_types_in_folder(
     folder: pathlib.Path, input_file_type: str, output_file_type: str
 ) -> None:
     for file in folder.iterdir():
@@ -30,7 +30,7 @@ def ConvertMatchingFileTypesInFolder(
             _ConvertFile(file, file.with_suffix(output_file_type))
 
 
-def CreateAdjustedPodcastForPlayback(
+def create_adjusted_podcast_for_playback(
     input_file: pathlib.Path, output_file: pathlib.Path, speed: float
 ) -> None:
     stream = ffmpeg.input(str(input_file))

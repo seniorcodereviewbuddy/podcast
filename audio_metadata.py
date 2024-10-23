@@ -38,7 +38,7 @@ def _GetAlbumFromM4A(file: pathlib.Path) -> str:
     return str(album[0])
 
 
-def GetAlbum(file: pathlib.Path) -> str:
+def get_album(file: pathlib.Path) -> str:
     ext = file.suffix.lower()
     if ext == ".mp3":
         return _GetAlbumFromMP3(file)
@@ -48,7 +48,7 @@ def GetAlbum(file: pathlib.Path) -> str:
     raise Exception("Unhandled filetype, path %s" % file)
 
 
-def GetTitle(file: pathlib.Path) -> str:
+def get_title(file: pathlib.Path) -> str:
     ext = file.suffix.lower()
     if ext == ".mp3":
         try:
@@ -70,7 +70,7 @@ def GetTitle(file: pathlib.Path) -> str:
     raise Exception("Unhandled filetype, path %s" % file)
 
 
-def SetMetadata(
+def set_metadata(
     file: pathlib.Path,
     title: typing.Optional[str] = None,
     album: typing.Optional[str] = None,

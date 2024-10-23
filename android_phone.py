@@ -13,7 +13,7 @@ class AndroidConnectionError(Exception):
     pass
 
 
-def IsPhoneConnected(phone_name: str) -> bool:
+def is_phone_connected(phone_name: str) -> bool:
     process = subprocess.run(["adb", "devices"], capture_output=True, text=True)
     regex_for_attached_phone = phone_name + r"\s+device"
     return (
@@ -33,9 +33,9 @@ class AndroidPhone(object):
         self.podcast_directory = podcast_directory
         self.history_file = history_file
 
-    def ConnectedToPhone(self, retry: bool = True) -> bool:
+    def connected_to_phone(self, retry: bool = True) -> bool:
         while True:
-            if IsPhoneConnected(self.phone_name):
+            if is_phone_connected(self.phone_name):
                 return True
             else:
                 if retry and user_input.prompt_yes_or_no(
@@ -49,7 +49,7 @@ class AndroidPhone(object):
         copied: set[pathlib.Path]
         failed_to_copy: set[pathlib.Path]
 
-    def CopyFilesToPhone(
+    def copy_files_to_phone(
         self, files: typing.List[pathlib.Path]
     ) -> CopyFilesToPhoneResults:
         date = datetime.datetime.now()
@@ -60,8 +60,8 @@ class AndroidPhone(object):
             )
             for file in files:
                 filename = file.name
-                podcast = audio_metadata.GetAlbum(file)
-                title = audio_metadata.GetTitle(file)
+                podcast = audio_metadata.get_album(file)
+                title = audio_metadata.get_title(file)
                 modified_time = podcast_episode.ModifiedTime(file)
                 readable_modified_time = datetime.datetime.fromtimestamp(
                     modified_time, tz=datetime.timezone.utc
@@ -98,7 +98,7 @@ class AndroidPhone(object):
 
         return AndroidPhone.CopyFilesToPhoneResults(copied, failed_to_copy)
 
-    def GetPodcastEpisodesOnPhone(self) -> set[str]:
+    def get_podcast_episodes_on_phone(self) -> set[str]:
         process = subprocess.run(
             [
                 "adb",

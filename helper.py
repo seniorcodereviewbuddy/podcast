@@ -14,9 +14,9 @@ def PrepareAudioAndMove(
 
     with tempfile.TemporaryDirectory() as tmpdir:
         working_copy = pathlib.Path(tmpdir, file.name)
-        conversions.CreateAdjustedPodcastForPlayback(file, working_copy, speed)
+        conversions.create_adjusted_podcast_for_playback(file, working_copy, speed)
 
-        audio_metadata.SetMetadata(working_copy, title=title, album=album)
+        audio_metadata.set_metadata(working_copy, title=title, album=album)
 
         # We don't copy the file to the destination until all the processing is
         # done to prevent the output folder from having incomplete files, or

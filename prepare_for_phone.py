@@ -44,7 +44,7 @@ def FindUnknownFolders(
 
 
 def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
-    current_title = audio_metadata.GetTitle(file)
+    current_title = audio_metadata.get_title(file)
     if current_title:
         return title_prefix + current_title
 
@@ -215,7 +215,7 @@ def main(
         user_settings.PodcastDirectoryOnPhone,
         user_settings.AndroidHistory,
     )
-    phone.ConnectedToPhone()
+    phone.connected_to_phone()
 
     time_in_hours = datetime.timedelta(hours=user_settings.TimeOfPodcastsToAddInHours)
     unprocessed_files = GetBatchofPodcastFiles(
@@ -258,7 +258,7 @@ def main(
         parsed_args.dry_run,
     )
 
-    if phone.ConnectedToPhone():
+    if phone.connected_to_phone():
         processed_files = [
             pathlib.Path(
                 user_settings.ProcessedFileBoardingZoneFolder,
@@ -266,7 +266,7 @@ def main(
             )
             for podcast in unprocessed_files
         ]
-        copy_results = phone.CopyFilesToPhone(processed_files)
+        copy_results = phone.copy_files_to_phone(processed_files)
 
         local_backup = backup.Local(
             user_settings.BackupFolder, user_settings.BackupHistory
@@ -279,15 +279,15 @@ def main(
             print(
                 f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.ProcessedFileBoardingZoneFolder}"
             )
-        local_backup.MoveFilesToBackup(copy_results.copied)
+        local_backup.move_files_to_backup(copy_results.copied)
 
         try:
-            files_on_phone = phone.GetPodcastEpisodesOnPhone()
+            files_on_phone = phone.get_podcast_episodes_on_phone()
         except android_phone.AndroidConnectionError as e:
             print(e)
             print("Failed to see android phone, skipping folder back sync")
         else:
-            local_backup.RemoveUnneededBackupFiles(files_on_phone)
+            local_backup.remove_unneeded_backup_files(files_on_phone)
 
 
 if __name__ == "__main__":

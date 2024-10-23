@@ -21,7 +21,7 @@ class TestE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.phone_emulator = android_emulator.AndroidEmulator()
-        cls.phone_emulator.WaitUntilReady()
+        cls.phone_emulator.wait_until_ready()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -31,7 +31,7 @@ class TestE2E(unittest.TestCase):
         self.root = tempfile.TemporaryDirectory()
 
         # Verify the emulator is ready and we can connect.
-        self.assertTrue(android_phone.IsPhoneConnected(TestE2E.phone_emulator.id))
+        self.assertTrue(android_phone.is_phone_connected(TestE2E.phone_emulator.id))
 
     def tearDown(self) -> None:
         self.root.cleanup()
@@ -147,7 +147,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
         )
         prepare_for_phone.main(args, test_settings)
@@ -177,7 +177,7 @@ class TestE2E(unittest.TestCase):
 
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
             podcast_shows,
             hours_to_add=0,
@@ -194,7 +194,7 @@ class TestE2E(unittest.TestCase):
             test_settings.AndroidHistory,
         )
         self.assertCountEqual(
-            expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+            expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
         files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
@@ -209,7 +209,7 @@ class TestE2E(unittest.TestCase):
         second_emulator = android_emulator.AndroidEmulator(
             avd_name=android_emulator.SECOND_ANDROID_AVD_NAME, port=5556
         )
-        second_emulator.WaitUntilReady()
+        second_emulator.wait_until_ready()
 
         user_input.side_effect = [
             # Initial for show 1.
@@ -232,7 +232,7 @@ class TestE2E(unittest.TestCase):
 
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
             podcast_shows,
             hours_to_add=0,
@@ -249,7 +249,7 @@ class TestE2E(unittest.TestCase):
             test_settings.AndroidHistory,
         )
         self.assertCountEqual(
-            expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+            expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
         files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
@@ -281,7 +281,7 @@ class TestE2E(unittest.TestCase):
 
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
             podcast_shows,
             hours_to_add=100,
@@ -299,7 +299,7 @@ class TestE2E(unittest.TestCase):
         )
 
         self.assertCountEqual(
-            expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+            expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
         files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
@@ -330,7 +330,7 @@ class TestE2E(unittest.TestCase):
 
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
             podcast_shows,
             hours_to_add=0,
@@ -348,7 +348,7 @@ class TestE2E(unittest.TestCase):
                 test_settings.AndroidHistory,
             )
             self.assertCountEqual(
-                expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+                expected_files_on_phone, phone.get_podcast_episodes_on_phone()
             )
 
             files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
@@ -384,7 +384,7 @@ class TestE2E(unittest.TestCase):
 
         test_settings = self.CreateTestSettings(
             TestE2E.phone_emulator.id,
-            TestE2E.phone_emulator.CreateNewPodcastFolder(),
+            TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
             podcast_shows,
             hours_to_add=100,
@@ -402,7 +402,7 @@ class TestE2E(unittest.TestCase):
         )
 
         self.assertCountEqual(
-            expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+            expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
         files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
@@ -419,7 +419,7 @@ class TestE2E(unittest.TestCase):
             test_settings.PodcastDirectoryOnPhone.joinpath(x.name).as_posix()
             for x in files_to_delete
         ]
-        TestE2E.phone_emulator.DeleteFiles(files_to_delete_full_path)
+        TestE2E.phone_emulator.delete_files(files_to_delete_full_path)
 
         # Run a second time.
         user_input.side_effect = [
@@ -444,7 +444,7 @@ class TestE2E(unittest.TestCase):
         expected_files_on_phone = [x.name for x in (episodes + files_to_keep)]
         self.maxDiff = None
         self.assertCountEqual(
-            expected_files_on_phone, phone.GetPodcastEpisodesOnPhone()
+            expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
         files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))

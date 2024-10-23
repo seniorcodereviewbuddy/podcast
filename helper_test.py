@@ -26,8 +26,8 @@ class TestHelper(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
-        self.assertEqual("new_title", audio_metadata.GetTitle(final_full_path))
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("new_title", audio_metadata.get_title(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
     def testListTitleAndAlbum(self) -> None:
         root = tempfile.mkdtemp()
@@ -48,9 +48,9 @@ class TestHelper(unittest.TestCase):
         self.assertTrue(os.path.exists(final_full_path))
         self.assertEqual(
             "new_title",
-            audio_metadata.GetTitle(final_full_path),
+            audio_metadata.get_title(final_full_path),
         )
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
     def testListTitleAndAlbumAfterNoTitleOrAlbum(self) -> None:
         root = tempfile.mkdtemp()
@@ -71,9 +71,9 @@ class TestHelper(unittest.TestCase):
         self.assertTrue(os.path.exists(final_full_path))
         self.assertEqual(
             "new_title",
-            audio_metadata.GetTitle(final_full_path),
+            audio_metadata.get_title(final_full_path),
         )
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
 
 if __name__ == "__main__":

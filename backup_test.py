@@ -9,7 +9,7 @@ import backup
 import test_utils
 
 
-def AlwaysSayYes(x: str) -> bool:
+def always_say_yes(x: str) -> bool:
     return True
 
 
@@ -49,7 +49,7 @@ class TestBackup(unittest.TestCase):
         self.assertCountEqual([], self._FilesInBackupFolder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
-        local_backup.MoveFilesToBackup(set())
+        local_backup.move_files_to_backup(set())
 
         self.assertCountEqual([], self._FilesInBackupFolder())
 
@@ -60,29 +60,29 @@ class TestBackup(unittest.TestCase):
         files = self._LoadFolderWithTestFiles(self.prebackup_folder)
         files_full_path = set([pathlib.Path(self.prebackup_folder, x) for x in files])
 
-        def FilesInPrebackupFolder() -> set[str]:
+        def files_in_prebackup_folder() -> set[str]:
             return set(os.listdir(self.prebackup_folder))
 
         self.assertCountEqual([], self._FilesInBackupFolder())
-        self.assertCountEqual(files, FilesInPrebackupFolder())
+        self.assertCountEqual(files, files_in_prebackup_folder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
-        local_backup.MoveFilesToBackup(files_full_path)
+        local_backup.move_files_to_backup(files_full_path)
 
         self.assertCountEqual(files, self._FilesInBackupFolder())
-        self.assertCountEqual([], FilesInPrebackupFolder())
+        self.assertCountEqual([], files_in_prebackup_folder())
 
     def testRemoveUnneededBackupFiles_Empty(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
 
-        local_backup.RemoveUnneededBackupFiles(set(), user_prompt=AlwaysSayYes)
+        local_backup.remove_unneeded_backup_files(set(), user_prompt=AlwaysSayYes)
 
     def testRemoveUnneededBackupFiles_AllFilesKept(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
 
         files = self._LoadFolderWithTestFiles(self.backup_folder)
 
-        local_backup.RemoveUnneededBackupFiles(files, user_prompt=AlwaysSayYes)
+        local_backup.remove_unneeded_backup_files(files, user_prompt=AlwaysSayYes)
 
         self.assertCountEqual(files, self._FilesInBackupFolder())
 
@@ -91,7 +91,7 @@ class TestBackup(unittest.TestCase):
 
         self._LoadFolderWithTestFiles(self.backup_folder)
 
-        local_backup.RemoveUnneededBackupFiles(set(), user_prompt=AlwaysSayYes)
+        local_backup.remove_unneeded_backup_files(set(), user_prompt=AlwaysSayYes)
 
         self.assertCountEqual([], self._FilesInBackupFolder())
 
@@ -102,7 +102,7 @@ class TestBackup(unittest.TestCase):
 
         final_files = set(itertools.islice(initial_files, len(initial_files) // 2))
 
-        local_backup.RemoveUnneededBackupFiles(final_files, user_prompt=AlwaysSayYes)
+        local_backup.remove_unneeded_backup_files(final_files, user_prompt=AlwaysSayYes)
 
         self.assertCountEqual(final_files, self._FilesInBackupFolder())
 

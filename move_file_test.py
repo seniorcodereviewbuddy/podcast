@@ -91,10 +91,10 @@ class TestMoveFile(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.archived_podcast_path))
 
         self.assertEqual(
-            "new_title", audio_metadata.GetTitle(self.destination_podcast_path)
+            "new_title", audio_metadata.get_title(self.destination_podcast_path)
         )
         self.assertEqual(
-            "new_album", audio_metadata.GetAlbum(self.destination_podcast_path)
+            "new_album", audio_metadata.get_album(self.destination_podcast_path)
         )
 
     def testProdRunNoArchive(self) -> None:
@@ -114,10 +114,10 @@ class TestMoveFile(unittest.TestCase):
         self.assertFalse(os.path.isfile(self.archived_podcast_path))
 
         self.assertEqual(
-            "new_title", audio_metadata.GetTitle(self.destination_podcast_path)
+            "new_title", audio_metadata.get_title(self.destination_podcast_path)
         )
         self.assertEqual(
-            "new_album", audio_metadata.GetAlbum(self.destination_podcast_path)
+            "new_album", audio_metadata.get_album(self.destination_podcast_path)
         )
 
 
