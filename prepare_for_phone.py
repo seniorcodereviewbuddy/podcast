@@ -238,7 +238,7 @@ def main(
         "\n%d files in total, duration of %s" % (len(unprocessed_files), total_duration)
     )
 
-    result = user_input.PromptYesOrNo(
+    result = user_input.prompt_yes_or_no(
         "Process files and move to '%s' before putting on phone: "
         % user_settings.ProcessedFileBoardingZoneFolder
     )

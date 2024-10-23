@@ -8,7 +8,7 @@ PreProcess_TypeAlias = typing.Callable[[pathlib.Path, DeletePrompt_TypeAlias], N
 
 
 def PromptForDelete(file: pathlib.Path) -> bool:
-    return user_input.PromptYesOrNo("Do you want to delete %s" % file)
+    return user_input.prompt_yes_or_no("Do you want to delete %s" % file)
 
 
 def PreProcessAddMP3Suffix(

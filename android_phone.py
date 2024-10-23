@@ -38,7 +38,7 @@ class AndroidPhone(object):
             if IsPhoneConnected(self.phone_name):
                 return True
             else:
-                if retry and user_input.PromptYesOrNo(
+                if retry and user_input.prompt_yes_or_no(
                     "Didn't find phone (%s), try again?" % (self.phone_name)
                 ):
                     continue

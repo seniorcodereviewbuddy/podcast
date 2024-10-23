@@ -159,7 +159,7 @@ class PodcastShow(object):
 
     def AddEpisode(self, path: pathlib.Path, allow_prompt: bool = True) -> None:
         if self.next_index is None:
-            if allow_prompt and not user_input.PromptYesOrNo(
+            if allow_prompt and not user_input.prompt_yes_or_no(
                 "Initialize next_index to 1 for %s" % (self.podcast_folder)
             ):
                 raise Exception()

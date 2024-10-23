@@ -20,7 +20,7 @@ class Local:
     def RemoveUnneededBackupFiles(
         self,
         current_files_to_backup: typing.Set[str],
-        user_prompt: user_input.PromptYesOrNo_Alias = user_input.PromptYesOrNo,
+        user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
     ) -> None:
         for file in self.backup_folder.iterdir():
             if not file.is_file():
