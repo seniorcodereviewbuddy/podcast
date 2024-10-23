@@ -31,7 +31,7 @@ class TestConversions(unittest.TestCase):
 
         return copies
 
-    def test_convert_matching_file_types_in_folder_m_p4s_to_m_p3s(self) -> None:
+    def test_convert_matching_file_types_in_folder_m_p4s_to_mp3s(self) -> None:
         files = self.create_test_file_copies(test_utils.MP4_TEST_FILE)
 
         conversions.convert_matching_file_types_in_folder(
@@ -42,7 +42,7 @@ class TestConversions(unittest.TestCase):
             self.assertFalse(file.exists())
             self.assertTrue(file.with_suffix(".mp3").exists())
 
-    def test_convert_matching_file_types_in_folder_webm_to_m4_a(self) -> None:
+    def test_convert_matching_file_types_in_folder_webm_to_m4a(self) -> None:
         files = self.create_test_file_copies(test_utils.WEBM_TEST_FILE)
 
         conversions.convert_matching_file_types_in_folder(
@@ -53,7 +53,7 @@ class TestConversions(unittest.TestCase):
             self.assertFalse(file.exists())
             self.assertTrue(file.with_suffix(".mp3").exists())
 
-    def test_convert_matching_file_types_in_folder_webm_to_m4_a_some_other_files_present(
+    def test_convert_matching_file_types_in_folder_webm_to_m4a_some_other_files_present(
         self,
     ) -> None:
         matching_files = self.create_test_file_copies(test_utils.WEBM_TEST_FILE)

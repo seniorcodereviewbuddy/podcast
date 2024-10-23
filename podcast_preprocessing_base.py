@@ -11,7 +11,7 @@ def prompt_for_delete(file: pathlib.Path) -> bool:
     return user_input.prompt_yes_or_no("Do you want to delete %s" % file)
 
 
-def pre_process_add_m_p3_suffix(
+def pre_process_add_mp3_suffix(
     folder: pathlib.Path, delete_prompt: DeletePrompt_TypeAlias
 ) -> None:
     for file in folder.iterdir():
