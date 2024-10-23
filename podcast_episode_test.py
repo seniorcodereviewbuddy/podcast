@@ -50,32 +50,34 @@ class TestPodcastEpisode(unittest.TestCase):
         episode.save(saved_data)
         self.assertEqual(data.getvalue(), saved_data.getvalue())
 
-    def testPodcastEpisodeLoadBadData_OnlyPath(self) -> None:
+    def test_podcast_episode_load_bad_data_only_path(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)
 
-    def testPodcastEpisodeLoadBadData_MissingDurationAndModification(self) -> None:
+    def test_podcast_episode_load_bad_data_missing_duration_and_modification(
+        self,
+    ) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)
 
-    def testPodcastEpisodeLoadBadData_MissingModification(self) -> None:
+    def test_podcast_episode_load_bad_data_missing_modification(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)
 
-    def testPodcastEpisodeLoadBadData_IndexNotInt(self) -> None:
+    def test_podcast_episode_load_bad_data_index_not_int(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\nbad index\n15\n100\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)
 
-    def testPodcastEpisodeLoadBadData_DurationNotInt(self) -> None:
+    def test_podcast_episode_load_bad_data_duration_not_int(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\nbad duration\n100\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)
 
-    def testPodcastEpisodeLoadBadData_ModificationNotInt(self) -> None:
+    def test_podcast_episode_load_bad_data_modification_not_int(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\nbad modification\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.load(data)

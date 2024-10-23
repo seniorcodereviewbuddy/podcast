@@ -113,7 +113,7 @@ class PodcastShow(object):
             self.preprocess(
                 full_folder_path,
                 # TODO: this isn't getting tested, becuase this is asking for user inputs and it isn't being mocked out.
-                podcast_preprocessing_base.PromptForDelete,
+                podcast_preprocessing_base.prompt_for_delete,
             )
 
         files_present = frozenset(
@@ -154,7 +154,7 @@ class PodcastShow(object):
     ) -> typing.Optional[full_podcast_episode.FullPodcastEpisode]:
         for episode in self.episodes:
             if episode.path == path:
-                return self._EpisodeAsFullPodcastEpisode(episode)
+                return self._episode_as_full_podcast_episode(episode)
         return None
 
     def add_episode(self, path: pathlib.Path, allow_prompt: bool = True) -> None:
@@ -169,14 +169,14 @@ class PodcastShow(object):
         self.episodes.append(podcast_episode.PodcastEpisode.new(path, self.next_index))
         self.next_index += 1
 
-    def _EpisodesWithoutIgnores(
+    def _episodes_without_ignores(
         self, files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None
     ) -> list[podcast_episode.PodcastEpisode]:
         if not files_to_ignore:
             return self.episodes
         return [x for x in self.episodes if x.path not in files_to_ignore]
 
-    def _EpisodeAsFullPodcastEpisode(
+    def _episode_as_full_podcast_episode(
         self, episode: podcast_episode.PodcastEpisode
     ) -> full_podcast_episode.FullPodcastEpisode:
         return full_podcast_episode.FullPodcastEpisode(
@@ -195,7 +195,7 @@ class PodcastShow(object):
         self,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.Optional[full_podcast_episode.FullPodcastEpisode]:
-        possible_episodes = self._EpisodesWithoutIgnores(files_to_ignore)
+        possible_episodes = self._episodes_without_ignores(files_to_ignore)
         if not possible_episodes:
             return None
 
@@ -204,21 +204,21 @@ class PodcastShow(object):
             if first_podcast.modification_time > episode.modification_time:
                 first_podcast = episode
 
-        return self._EpisodeAsFullPodcastEpisode(first_podcast)
+        return self._episode_as_full_podcast_episode(first_podcast)
 
     def remaining_episodes(
         self,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
         return [
-            self._EpisodeAsFullPodcastEpisode(x)
-            for x in self._EpisodesWithoutIgnores(files_to_ignore)
+            self._episode_as_full_podcast_episode(x)
+            for x in self._episodes_without_ignores(files_to_ignore)
         ]
 
     def remaining_time(
         self, files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None
     ) -> int:
         duration = 0
-        for episode in self._EpisodesWithoutIgnores(files_to_ignore):
+        for episode in self._episodes_without_ignores(files_to_ignore):
             duration += episode.duration
         return duration

@@ -10,7 +10,7 @@ import test_utils
 
 
 class TestHelper(unittest.TestCase):
-    def testPrepareAudioAndMoveMP3(self) -> None:
+    def test_prepare_audio_and_move_m_p3(self) -> None:
         root = tempfile.mkdtemp()
         podcast_folder = pathlib.Path(root, "podcast")
         os.mkdir(podcast_folder)

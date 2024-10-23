@@ -86,7 +86,7 @@ class Settings(object):
         self._SPECIFIED_FILES = specified_files
 
     @property
-    def android_phone_i_d(self) -> str:
+    def android_phone_id(self) -> str:
         return self._ANDROID_PHONE_ID
 
     @property
@@ -94,7 +94,7 @@ class Settings(object):
         return self._PODCAST_FOLDER
 
     @property
-    def processed_file_boarding_zone_folder(self) -> pathlib.Path:
+    def processed__file__boarding_zone_folder(self) -> pathlib.Path:
         return self._PROCESSED_FILE_BOARDING_ZONE_FOLDER
 
     @property

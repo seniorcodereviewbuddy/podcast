@@ -17,7 +17,7 @@ class FileTypeError(Exception):
     pass
 
 
-def _GetAlbumFromMP3(file: pathlib.Path) -> str:
+def _get_album_from_m_p3(file: pathlib.Path) -> str:
     try:
         tags = ID3(str(file))  # type: ignore
     except ID3NoHeaderError:
@@ -29,7 +29,7 @@ def _GetAlbumFromMP3(file: pathlib.Path) -> str:
     return str(album[0])
 
 
-def _GetAlbumFromM4A(file: pathlib.Path) -> str:
+def _get_album_from_m4_a(file: pathlib.Path) -> str:
     m4a_file = MP4(str(file))  # type: ignore
     if M4A_ALBUM_TAG not in m4a_file:
         return NO_ALBUM_FOUND
@@ -41,9 +41,9 @@ def _GetAlbumFromM4A(file: pathlib.Path) -> str:
 def get_album(file: pathlib.Path) -> str:
     ext = file.suffix.lower()
     if ext == ".mp3":
-        return _GetAlbumFromMP3(file)
+        return _get_album_from_m_p3(file)
     elif ext == ".m4a":
-        return _GetAlbumFromM4A(file)
+        return _get_album_from_m4_a(file)
 
     raise Exception("Unhandled filetype, path %s" % file)
 

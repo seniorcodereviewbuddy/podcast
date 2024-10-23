@@ -43,7 +43,7 @@ def find_unknown_folders(
     return unknown_folders
 
 
-def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
+def _generate_title(file: pathlib.Path, title_prefix: str) -> str:
     current_title = audio_metadata.get_title(file)
     if current_title:
         return title_prefix + current_title
@@ -89,7 +89,7 @@ def process_and_move_files_over(
             q: queue.Queue[str] = queue.Queue()
 
             title_prefix = "%04d_" % (file.index) if file.index else ""
-            title = _GenerateTitle(file.path, title_prefix)
+            title = _generate_title(file.path, title_prefix)
 
             album = file.path.parent.name
 
@@ -143,7 +143,7 @@ def get_batchof_podcast_files(
     required_files: typing.Optional[
         typing.Dict[pathlib.Path, typing.List[pathlib.Path]]
     ] = None,
-    user_prompt: user_input.PromptYesOrNo_Alias = user_input.PromptYesOrNo,
+    user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
 ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
     """
     GetBatchofPodcastFiles returns |duration_limit| time of podcasts.
@@ -183,7 +183,7 @@ def main(
     parsed_args = parser.parse_args(args)
 
     unknown_folders = find_unknown_folders(
-        user_settings.PodcastFolder, user_settings.Podcasts
+        user_settings.podcast_folder, user_settings.podcasts
     )
     if unknown_folders:
         # TODO: Ideally this should return an error for tests.
@@ -195,34 +195,36 @@ def main(
         input()
         return
 
-    database = podcast_database.podcast_database(
-        user_settings.PodcastFolder,
-        user_settings.Podcasts,
+    database = podcast_database.PodcastDatabase(
+        user_settings.podcast_folder,
+        user_settings.podcasts,
         parsed_args.verbose,
     )
-    database.load(user_settings.PodcastDatabase)
+    database.load(user_settings.podcast_database)
 
     database.update_podcasts()
     if parsed_args.dry_run:
         print("Skipping database update for dry run")
     else:
-        database.save(user_settings.PodcastDatabase)
-        database.update_remaining_time(user_settings.PodcastHistory)
-        database.log_stats(user_settings.PodcastStats)
+        database.save(user_settings.podcast_database)
+        database.update_remaining_time(user_settings.podcast_history)
+        database.log_stats(user_settings.podcast_stats)
 
     phone = android_phone.AndroidPhone(
-        user_settings.AndroidPhoneID,
-        user_settings.PodcastDirectoryOnPhone,
-        user_settings.AndroidHistory,
+        user_settings.android_phone_id,
+        user_settings.podcast_directory_on_phone,
+        user_settings.android_history,
     )
     phone.connected_to_phone()
 
-    time_in_hours = datetime.timedelta(hours=user_settings.TimeOfPodcastsToAddInHours)
+    time_in_hours = datetime.timedelta(
+        hours=user_settings.time_of_podcasts_to_add_in_hours
+    )
     unprocessed_files = get_batchof_podcast_files(
         database,
         time_in_hours,
-        user_settings.NumOldestEpisodesToAdd,
-        user_settings.SpecifiedFiles,
+        user_settings.num_oldest_episodes_to_add,
+        user_settings.specified_files,
     )
 
     total_duration = sum((x.duration for x in unprocessed_files), datetime.timedelta())
@@ -240,7 +242,7 @@ def main(
 
     result = user_input.prompt_yes_or_no(
         "Process files and move to '%s' before putting on phone: "
-        % user_settings.ProcessedFileBoardingZoneFolder
+        % user_settings.processed__file__boarding_zone_folder
     )
 
     if not result:
@@ -248,20 +250,20 @@ def main(
         return
 
     # TODO: Raise an exception if it exists and is a file?
-    if not user_settings.ProcessedFileBoardingZoneFolder.exists():
-        os.mkdir(user_settings.ProcessedFileBoardingZoneFolder)
+    if not user_settings.processed__file__boarding_zone_folder.exists():
+        os.mkdir(user_settings.processed__file__boarding_zone_folder)
 
     process_and_move_files_over(
         unprocessed_files,
-        user_settings.ProcessedFileBoardingZoneFolder,
-        user_settings.ArchiveFolder,
+        user_settings.processed__file__boarding_zone_folder,
+        user_settings.archive_folder,
         parsed_args.dry_run,
     )
 
     if phone.connected_to_phone():
         processed_files = [
             pathlib.Path(
-                user_settings.ProcessedFileBoardingZoneFolder,
+                user_settings.processed__file__boarding_zone_folder,
                 podcast.path.name,
             )
             for podcast in unprocessed_files
@@ -269,7 +271,7 @@ def main(
         copy_results = phone.copy_files_to_phone(processed_files)
 
         local_backup = backup.Local(
-            user_settings.BackupFolder, user_settings.BackupHistory
+            user_settings.backup_folder, user_settings.backup_history
         )
 
         if copy_results.failed_to_copy:
@@ -277,7 +279,7 @@ def main(
                 f"WARNING: NOT ADDING {len(copy_results.failed_to_copy)} FILES TO BACKUP"
             )
             print(
-                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.ProcessedFileBoardingZoneFolder}"
+                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.processed__file__boarding_zone_folder}"
             )
         local_backup.move_files_to_backup(copy_results.copied)
 

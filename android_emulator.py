@@ -33,7 +33,7 @@ class AndroidEmulator:
             stderr=subprocess.DEVNULL,
         )
 
-    def __del__(self) -> None:
+    def _del_(self) -> None:
         # Tell the emulator to shut itself off.
         args = ["adb", "-s", self.id, "shell", "reboot", "-p"]
         subprocess.run(args, check=True)

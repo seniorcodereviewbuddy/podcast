@@ -91,7 +91,7 @@ class TestE2E(unittest.TestCase):
             specified_files,
         )
 
-    def _PopulatePodcastShow(
+    def _populate_podcast_show(
         self,
         podcast_dir: pathlib.Path,
         num_episodes: int = 10,
@@ -119,8 +119,10 @@ class TestE2E(unittest.TestCase):
         show_files = []
         for x in range(num_episodes):
             test_file = test_files[x % len(test_files)]
-            new_file_name = file_prefix + test_file.stem + str(x + 1) + test_file.suffix
-            copied_file = pathlib.Path(podcast_folder, new_file_name)
+            new__file__name = (
+                file_prefix + test_file.stem + str(x + 1) + test_file.suffix
+            )
+            copied_file = pathlib.Path(podcast_folder, new__file__name)
             show_files.append(copied_file)
 
             shutil.copyfile(
@@ -134,7 +136,9 @@ class TestE2E(unittest.TestCase):
         return show_files
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_NoShows_NoCopyToPhone(self, user_input: mock.Mock) -> None:
+    def test_full_end_to_end_test_no_shows_no_copy_to_phone(
+        self, user_input: mock.Mock
+    ) -> None:
         user_input.side_effect = [
             # Continue to Priority 1?
             "N",
@@ -153,7 +157,7 @@ class TestE2E(unittest.TestCase):
         prepare_for_phone.main(args, test_settings)
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_WithShow_CopyToPhone_OneFile(
+    def test_full_end_to_end_test_with_show_copy_to_phone_one_file(
         self, user_input: mock.Mock
     ) -> None:
         user_input.side_effect = [
@@ -173,7 +177,7 @@ class TestE2E(unittest.TestCase):
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
-        episodes = self._PopulatePodcastShow(podcast_show_folder)
+        episodes = self._populate_podcast_show(podcast_show_folder)
 
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
@@ -190,18 +194,18 @@ class TestE2E(unittest.TestCase):
 
         phone = android_phone.AndroidPhone(
             TestE2E.phone_emulator.id,
-            test_settings.PodcastDirectoryOnPhone,
-            test_settings.AndroidHistory,
+            test_settings.podcast_directory_on_phone,
+            test_settings.android_history,
         )
         self.assertCountEqual(
             expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
-        files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_WithShow_CopyToPhone_OneFile_TwoPhonesActive(
+    def test_full_end_to_end_test_with_show_copy_to_phone_one__file__two_phones_active(
         self, user_input: mock.Mock
     ) -> None:
         # Create another android emulator on a different port.
@@ -228,7 +232,7 @@ class TestE2E(unittest.TestCase):
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
-        episodes = self._PopulatePodcastShow(podcast_show_folder)
+        episodes = self._populate_podcast_show(podcast_show_folder)
 
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
@@ -245,18 +249,18 @@ class TestE2E(unittest.TestCase):
 
         phone = android_phone.AndroidPhone(
             TestE2E.phone_emulator.id,
-            test_settings.PodcastDirectoryOnPhone,
-            test_settings.AndroidHistory,
+            test_settings.podcast_directory_on_phone,
+            test_settings.android_history,
         )
         self.assertCountEqual(
             expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
-        files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_WithShow_CopyToPhone_AllFiles(
+    def test_full_end_to_end_test_with_show_copy_to_phone_all_files(
         self, user_input: mock.Mock
     ) -> None:
         user_input.side_effect = [
@@ -277,7 +281,7 @@ class TestE2E(unittest.TestCase):
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
-        episodes = self._PopulatePodcastShow(podcast_show_folder)
+        episodes = self._populate_podcast_show(podcast_show_folder)
 
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
@@ -294,19 +298,19 @@ class TestE2E(unittest.TestCase):
 
         phone = android_phone.AndroidPhone(
             TestE2E.phone_emulator.id,
-            test_settings.PodcastDirectoryOnPhone,
-            test_settings.AndroidHistory,
+            test_settings.podcast_directory_on_phone,
+            test_settings.android_history,
         )
 
         self.assertCountEqual(
             expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
-        files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_WithShow_CopyToPhone_MultipleTimes(
+    def test_full_end_to_end_test_with_show_copy_to_phone_multiple_times(
         self, user_input: mock.Mock
     ) -> None:
         times_to_run = 5
@@ -321,7 +325,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
 
         podcast_show_folder = pathlib.Path(podcast_folder, "show_1")
-        episodes = self._PopulatePodcastShow(podcast_show_folder)
+        episodes = self._populate_podcast_show(podcast_show_folder)
 
         args: list[str] = []
         podcast_shows = self.default_shows() + [
@@ -344,18 +348,18 @@ class TestE2E(unittest.TestCase):
 
             phone = android_phone.AndroidPhone(
                 TestE2E.phone_emulator.id,
-                test_settings.PodcastDirectoryOnPhone,
-                test_settings.AndroidHistory,
+                test_settings.podcast_directory_on_phone,
+                test_settings.android_history,
             )
             self.assertCountEqual(
                 expected_files_on_phone, phone.get_podcast_episodes_on_phone()
             )
 
-            files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+            files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
             self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
     @mock.patch("builtins.input")
-    def testFullEndToEndTest_WithShow_CopyToPhone_DeleteSomeEpisodes_CopyAgain(
+    def test_full_end_to_end_test_with_show_copy_to_phone_delete_some_episodes_copy_again(
         self, user_input: mock.Mock
     ) -> None:
         user_input.side_effect = [
@@ -377,7 +381,7 @@ class TestE2E(unittest.TestCase):
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
-        episodes = self._PopulatePodcastShow(
+        episodes = self._populate_podcast_show(
             podcast_show_folder,
             file_prefix="batch_1_",
         )
@@ -397,15 +401,15 @@ class TestE2E(unittest.TestCase):
 
         phone = android_phone.AndroidPhone(
             TestE2E.phone_emulator.id,
-            test_settings.PodcastDirectoryOnPhone,
-            test_settings.AndroidHistory,
+            test_settings.podcast_directory_on_phone,
+            test_settings.android_history,
         )
 
         self.assertCountEqual(
             expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
-        files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
         # Delete the first half of the files from the phone.
@@ -416,7 +420,7 @@ class TestE2E(unittest.TestCase):
         )
 
         files_to_delete_full_path = [
-            test_settings.PodcastDirectoryOnPhone.joinpath(x.name).as_posix()
+            test_settings.podcast_directory_on_phone.joinpath(x.name).as_posix()
             for x in files_to_delete
         ]
         TestE2E.phone_emulator.delete_files(files_to_delete_full_path)
@@ -432,7 +436,7 @@ class TestE2E(unittest.TestCase):
             "Y"
         ] * num_files_to_delete
 
-        episodes = self._PopulatePodcastShow(
+        episodes = self._populate_podcast_show(
             podcast_show_folder,
             file_prefix="batch_2_",
         )
@@ -447,7 +451,7 @@ class TestE2E(unittest.TestCase):
             expected_files_on_phone, phone.get_podcast_episodes_on_phone()
         )
 
-        files_in_backup_folder = set(os.listdir(test_settings.BackupFolder))
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
         self.assertCountEqual(expected_files_on_phone, files_in_backup_folder)
 
 

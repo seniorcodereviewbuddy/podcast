@@ -8,7 +8,7 @@ import typing
 import helper
 
 
-def _ArchiveFile(
+def _archive_file(
     file_source: pathlib.Path, archive_destination: pathlib.Path, dry_run: bool
 ) -> None:
     if not archive_destination:
@@ -25,7 +25,7 @@ def _ArchiveFile(
         shutil.copyfile(file_source, archive_destination)
 
 
-def _UpdateFileandMoveOver(
+def _update_fileand_move_over(
     file_source: pathlib.Path,
     file_destination: pathlib.Path,
     title: str,
@@ -53,11 +53,11 @@ def main(args: typing.Optional[typing.List[str]]) -> None:
     parser.add_argument("--dry-run", action="store_true", default=False)
     parsed_args = parser.parse_args(args)
 
-    _ArchiveFile(
+    _archive_file(
         parsed_args.file_path, parsed_args.archive_destination, parsed_args.dry_run
     )
 
-    _UpdateFileandMoveOver(
+    _update_fileand_move_over(
         parsed_args.file_path,
         parsed_args.file_destination,
         parsed_args.title,

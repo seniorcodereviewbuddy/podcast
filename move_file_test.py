@@ -13,13 +13,13 @@ class TestMoveFile(unittest.TestCase):
     def setUp(self) -> None:
         self.holding_dir = tempfile.TemporaryDirectory()
 
-        test_file_source = pathlib.Path(
+        test__file__source = pathlib.Path(
             test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE
         )
         self.podcast_file = pathlib.Path(
             self.holding_dir.name, test_utils.MP3_TEST_FILE
         )
-        shutil.copyfile(test_file_source, self.podcast_file)
+        shutil.copyfile(test__file__source, self.podcast_file)
 
         self.destination = pathlib.Path(self.holding_dir.name, "destination")
         os.makedirs(self.destination)

@@ -34,12 +34,12 @@ class TestFileCopyContextManager(contextlib.AbstractContextManager[pathlib.Path]
 
 
 class TestAudioMetadata(unittest.TestCase):
-    def testGetAlbumMP3(self) -> None:
+    def test_get_album_m_p3(self) -> None:
         full_path = pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE)
         title = audio_metadata.get_album(full_path)
         self.assertEqual("Test Data Album", title)
 
-    def testGetAlbumMP3ValueMissing(self) -> None:
+    def test_get_album_m_p3_value_missing(self) -> None:
         full_path = pathlib.Path(
             test_utils.TEST_DATA_DIR, test_utils.MP3_NO_TITLE_NO_ALBUM
         )
@@ -49,7 +49,7 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testGetAlbumM4A(self) -> None:
+    def test_get_album_m4_a(self) -> None:
         full_path = pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.M4A_TEST_FILE)
         title = audio_metadata.get_album(full_path)
         self.assertEqual(
@@ -57,7 +57,7 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testGetAlbumM4AValueMissing(self) -> None:
+    def test_get_album_m4_a_value_missing(self) -> None:
         full_path = pathlib.Path(
             test_utils.TEST_DATA_DIR, test_utils.M4A_NO_TITLE_NO_ALBUM
         )
@@ -67,12 +67,12 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testGetTitleMP3(self) -> None:
+    def test_get_title_m_p3(self) -> None:
         full_path = pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE)
         title = audio_metadata.get_title(full_path)
         self.assertEqual("Test MP3", title)
 
-    def testGetTitleMP3ValueMissing(self) -> None:
+    def test_get_title_m_p3_value_missing(self) -> None:
         full_path = pathlib.Path(
             test_utils.TEST_DATA_DIR, test_utils.MP3_NO_TITLE_NO_ALBUM
         )
@@ -82,7 +82,7 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testGetTitleM4A(self) -> None:
+    def test_get_title_m4_a(self) -> None:
         full_path = pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.M4A_TEST_FILE)
         title = audio_metadata.get_title(full_path)
         self.assertEqual(
@@ -90,7 +90,7 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testGetTitleM4AValueMissing(self) -> None:
+    def test_get_title_m4_a_value_missing(self) -> None:
         full_path = pathlib.Path(
             test_utils.TEST_DATA_DIR, test_utils.M4A_NO_TITLE_NO_ALBUM
         )
@@ -100,63 +100,63 @@ class TestAudioMetadata(unittest.TestCase):
             title,
         )
 
-    def testSetMetadata_MP3_AlbumAndTitle(self) -> None:
+    def test_set_metadata_m_p3_album_and_title(self) -> None:
         with TestFileCopyContextManager(test_utils.MP3_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, "NEW_TITLE", "NEW_ALBUM")
 
             self.assertEqual("NEW_ALBUM", audio_metadata.get_album(full_path))
             self.assertEqual("NEW_TITLE", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_MP3_OnlyTitle(self) -> None:
+    def test_set_metadata_m_p3_only_title(self) -> None:
         with TestFileCopyContextManager(test_utils.MP3_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, title="NEW_TITLE")
 
             self.assertEqual("Test Data Album", audio_metadata.get_album(full_path))
             self.assertEqual("NEW_TITLE", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_MP3_OnlyAlbum(self) -> None:
+    def test_set_metadata_m_p3_only_album(self) -> None:
         with TestFileCopyContextManager(test_utils.MP3_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, album="NEW_ALBUM")
 
             self.assertEqual("NEW_ALBUM", audio_metadata.get_album(full_path))
             self.assertEqual("Test MP3", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_MP3_NoValues(self) -> None:
+    def test_set_metadata_m_p3_no_values(self) -> None:
         with TestFileCopyContextManager(test_utils.MP3_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path)
 
             self.assertEqual("Test Data Album", audio_metadata.get_album(full_path))
             self.assertEqual("Test MP3", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_M4A_AlbumAndTitle(self) -> None:
+    def test_set_metadata_m4_a_album_and_title(self) -> None:
         with TestFileCopyContextManager(test_utils.M4A_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, "NEW_TITLE", "NEW_ALBUM")
 
             self.assertEqual("NEW_ALBUM", audio_metadata.get_album(full_path))
             self.assertEqual("NEW_TITLE", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_M4A_OnlyTitle(self) -> None:
+    def test_set_metadata_m4_a_only_title(self) -> None:
         with TestFileCopyContextManager(test_utils.M4A_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, title="NEW_TITLE")
 
             self.assertEqual("m4a test album", audio_metadata.get_album(full_path))
             self.assertEqual("NEW_TITLE", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_M4A_OnlyAlbum(self) -> None:
+    def test_set_metadata_m4_a_only_album(self) -> None:
         with TestFileCopyContextManager(test_utils.M4A_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path, album="NEW_ALBUM")
 
             self.assertEqual("NEW_ALBUM", audio_metadata.get_album(full_path))
             self.assertEqual("m4a test", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_M4A_NoValues(self) -> None:
+    def test_set_metadata_m4_a_no_values(self) -> None:
         with TestFileCopyContextManager(test_utils.M4A_TEST_FILE) as full_path:
             audio_metadata.set_metadata(full_path)
 
             self.assertEqual("m4a test album", audio_metadata.get_album(full_path))
             self.assertEqual("m4a test", audio_metadata.get_title(full_path))
 
-    def testSetMetadata_InvalidFileType(self) -> None:
+    def test_set_metadata_invalid__file__type(self) -> None:
         with tempfile.TemporaryDirectory() as f:
             full_path = pathlib.Path(f, "test.txt")
             full_path.touch()

@@ -155,7 +155,7 @@ class TestPodcast(unittest.TestCase):
             os.remove(pathlib.Path(folder, podcast_file))
 
         p = podcast_show.PodcastShow(
-            pathlib.Path("my_podcast"), podcast_show.P0, preprocess=clearFile
+            pathlib.Path("my_podcast"), podcast_show.P0, preprocess=clear_file
         )
         p.scan_for_updates(self.root)
         self.assertFalse(os.path.exists(podcast_file))
