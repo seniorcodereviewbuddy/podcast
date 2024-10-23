@@ -11,6 +11,8 @@ import run_tests
 
 ROOT_FOLDER = os.path.dirname(__file__)
 
+EXPECTED_ENCODING = "utf-8"
+
 
 def RunProcess(args: list[str]) -> subprocess.CompletedProcess[str]:
     # Send the output through print directly here, otherwise there were odd flushing races with the other prints.
@@ -24,7 +26,6 @@ def RunProcess(args: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def main(args: typing.Optional[list[str]]) -> int:
-    EXPECTED_ENCODING = "utf-8"
     if sys.stdout.encoding != EXPECTED_ENCODING:
         if sys.version_info < (3, 7) or not isinstance(sys.stdout, io.TextIOWrapper):
             print(
