@@ -48,7 +48,7 @@ class PodcastDatabase(object):
         if self.verbose:
             print(message)
 
-    def Load(
+    def load(
         self,
         path: pathlib.Path,
         user_input_function: typing.Callable[[str], str] = input,
@@ -66,7 +66,7 @@ class PodcastDatabase(object):
                 match_found = False
                 for possible_podcast in self.podcast_shows:
                     if possible_podcast.podcast_folder == podcast_folder:
-                        possible_podcast.Load(f)
+                        possible_podcast.load(f)
                         loaded += 1
                         match_found = True
                         break
@@ -85,21 +85,21 @@ class PodcastDatabase(object):
                         # then don't save this data anywhere since we no longer want it.
                         podcast_show.PodcastShow(
                             podcast_folder, podcast_show.PRIORITY_SKIP
-                        ).Load(f)
+                        ).load(f)
                     else:
                         raise DatabaseLoadingError(
                             "Failed to load %s." % (podcast_folder)
                         )
         return loaded
 
-    def Save(self, path: pathlib.Path) -> None:
+    def save(self, path: pathlib.Path) -> None:
         with open(path, "w", encoding="utf-8") as f:
             f.write(str(len(self.podcast_shows)) + "\n")
             for pod in sorted(self.podcast_shows):
                 f.write(str(pod.podcast_folder) + "\n")
-                pod.Save(f)
+                pod.save(f)
 
-    def UpdatePodcasts(self, allow_prompt: bool = True) -> None:
+    def update_podcasts(self, allow_prompt: bool = True) -> None:
         # Drop all missing podcast shows.
         self.podcast_shows = [
             podcast_show
@@ -111,9 +111,9 @@ class PodcastDatabase(object):
             if pod.priority == podcast_show.PRIORITY_SKIP:
                 print("Skipping %s" % (pod))
                 continue
-            pod.ScanForUpdates(self.root, allow_prompt=allow_prompt)
+            pod.scan_for_updates(self.root, allow_prompt=allow_prompt)
 
-    def _GetAllPodcastShowsSortedByPriority(
+    def _get_all_podcast_shows_sorted_by_priority(
         self,
     ) -> typing.List[podcast_show.PodcastShow]:
         priority: typing.Dict[int, typing.List[podcast_show.PodcastShow]] = {}
@@ -127,19 +127,19 @@ class PodcastDatabase(object):
             podcast_shows.extend(sorted(priority.get(p, [])))
         return podcast_shows
 
-    def UpdateRemainingTime(
+    def update_remaining_time(
         self,
         path: pathlib.Path,
         date: typing.Optional[datetime.datetime] = None,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> None:
         date = datetime.datetime.now() if date is None else date
-        podcast_shows = self._GetAllPodcastShowsSortedByPriority()
+        podcast_shows = self._get_all_podcast_shows_sorted_by_priority()
         num_remaining_episodes = sum(
-            len(x.RemainingEpisodes(files_to_ignore)) for x in podcast_shows
+            len(x.remaining_episodes(files_to_ignore)) for x in podcast_shows
         )
         remaining_duration = sum(
-            x.RemainingTime(files_to_ignore) for x in podcast_shows
+            x.remaining_time(files_to_ignore) for x in podcast_shows
         )
 
         with open(path, "a", encoding="utf-8") as f:
@@ -148,58 +148,58 @@ class PodcastDatabase(object):
                 % (
                     date.strftime("%Y-%m-%d %H:%M:%S"),
                     num_remaining_episodes,
-                    time_helper.SecondsToString(remaining_duration),
+                    time_helper.seconds_to_string(remaining_duration),
                 )
             )
 
-    def LogStats(
+    def log_stats(
         self,
         path: pathlib.Path,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> None:
-        podcast_shows = self._GetAllPodcastShowsSortedByPriority()
+        podcast_shows = self._get_all_podcast_shows_sorted_by_priority()
 
         with open(path, "w", encoding="utf-8") as f:
             for x in podcast_shows:
-                remaining_episodes = x.RemainingEpisodes(files_to_ignore)
+                remaining_episodes = x.remaining_episodes(files_to_ignore)
                 if not remaining_episodes:
                     continue
-                total_duration = x.RemainingTime(files_to_ignore)
+                total_duration = x.remaining_time(files_to_ignore)
                 average_duration = total_duration / len(remaining_episodes)
                 f.write(
                     "%s: total duration of %s, %d episodes, %s long on average\n"
                     % (
                         x.podcast_folder,
-                        time_helper.SecondsToString(total_duration),
+                        time_helper.seconds_to_string(total_duration),
                         len(remaining_episodes),
-                        time_helper.SecondsToString(average_duration),
+                        time_helper.seconds_to_string(average_duration),
                     )
                 )
 
-    def _GetFirstEpisodeForEachPodcast(
+    def _get_first_episode_for_each_podcast(
         self,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
-        first_episodes = [x.FirstEpisode(files_to_ignore) for x in self.podcast_shows]
+        first_episodes = [x.first_episode(files_to_ignore) for x in self.podcast_shows]
         return [x for x in first_episodes if x]
 
     # TODO: Can I merge this with above by defaulting to all priorities or something like that?
-    def _GetFirstEpisodeForEachPodcastOfPriority(
+    def _get_first_episode_for_each_podcast_of_priority(
         self,
         priority: int,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
         first_episodes = [
-            x.FirstEpisode(files_to_ignore)
+            x.first_episode(files_to_ignore)
             for x in self.podcast_shows
             if x.priority == priority
         ]
         return [x for x in first_episodes if x]
 
-    def GetPodcastEpisodesByPriority(
+    def get_podcast_episodes_by_priority(
         self,
         duration_limit: datetime.timedelta,
-        user_prompt: user_input.PromptYesOrNo_Alias = user_input.PromptYesOrNo,
+        user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
         random.seed(None)
@@ -209,7 +209,7 @@ class PodcastDatabase(object):
         files_to_ignore = files_to_ignore or []
 
         while current_duration < duration_limit:
-            next_podcasts = self._GetFirstEpisodeForEachPodcastOfPriority(
+            next_podcasts = self._get_first_episode_for_each_podcast_of_priority(
                 current_priority,
                 files_to_ignore=[x.path for x in weekly_episodes] + files_to_ignore,
             )
@@ -238,7 +238,7 @@ class PodcastDatabase(object):
 
         return weekly_episodes
 
-    def GetOldestFiles(
+    def get_oldest_files(
         self,
         num_files_to_get: int,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
@@ -246,7 +246,7 @@ class PodcastDatabase(object):
         oldest_episodes: typing.List[full_podcast_episode.FullPodcastEpisode] = []
         files_to_ignore = [] if files_to_ignore is None else files_to_ignore
         for _ in range(num_files_to_get):
-            oldest_episodes_left = self._GetFirstEpisodeForEachPodcast(
+            oldest_episodes_left = self._get_first_episode_for_each_podcast(
                 files_to_ignore=files_to_ignore + [x.path for x in oldest_episodes]
             )
             if not oldest_episodes_left:
@@ -265,7 +265,7 @@ class PodcastDatabase(object):
 
         return oldest_episodes
 
-    def GetSpecifiedFiles(
+    def get_specified_files(
         self,
         specified_files: typing.Dict[pathlib.Path, typing.List[pathlib.Path]],
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
@@ -287,7 +287,7 @@ class PodcastDatabase(object):
                 full_potential_path = pathlib.Path(
                     self.root, show.podcast_folder, episode_path
                 )
-                matching_episode = show.GetEpisode(full_potential_path)
+                matching_episode = show.get_episode(full_potential_path)
                 if not matching_episode:
                     raise PodcastEpisodePathError(
                         "File, %s, doesn't exists for show %s"

@@ -13,7 +13,7 @@ import podcast_show
 import test_utils
 
 
-def FileContents(file: pathlib.Path) -> str:
+def file_contents(file: pathlib.Path) -> str:
     with open(file, "r", encoding="utf-8") as f:
         return f.read()
 
@@ -26,7 +26,7 @@ class TestPodcastDatabase(unittest.TestCase):
     def tearDown(self) -> None:
         self._root_directory.cleanup()
 
-    def _CreatePodcastShow(
+    def _create_podcast_show(
         self,
         podcast_dir: pathlib.Path,
         priority: int,
@@ -50,17 +50,17 @@ class TestPodcastDatabase(unittest.TestCase):
 
         return podcast_show.PodcastShow(podcast_folder, priority)
 
-    def testSaveAndLoad_Empty(self) -> None:
+    def test_save_and_load_empty(self) -> None:
         database = podcast_database.PodcastDatabase(self.root, [], False)
 
         database_folder = tempfile.mkdtemp()
         database_file = pathlib.Path(database_folder, "database.txt")
-        database.Save(database_file)
-        self.assertEqual("0\n", FileContents(database_file))
+        database.save(database_file)
+        self.assertEqual("0\n", file_contents(database_file))
 
-        database.Load(database_file)
+        database.load(database_file)
 
-    def testSaveAndLoad_Basic(self) -> None:
+    def test_save_and_load_basic(self) -> None:
         known_folder = pathlib.Path("known_folder")
         podcast_folder = pathlib.Path(self.root, known_folder)
         os.mkdir(podcast_folder)
@@ -74,17 +74,17 @@ class TestPodcastDatabase(unittest.TestCase):
         for p in database.podcast_shows:
             p.next_index = 1
 
-        database.UpdatePodcasts()
+        database.update_podcasts()
 
         database_folder = tempfile.mkdtemp()
         database_file = pathlib.Path(database_folder, "database.txt")
-        database.Save(database_file)
+        database.save(database_file)
 
         self.assertEqual(
-            "1\nknown_folder\nknown_folder\n1\n0\n", FileContents(database_file)
+            "1\nknown_folder\nknown_folder\n1\n0\n", file_contents(database_file)
         )
 
-        self.assertEqual(1, database.Load(database_file))
+        self.assertEqual(1, database.load(database_file))
 
         # Now try with files.
         # TODO: Move this creation into a helper function, it happens a lot here.
@@ -99,10 +99,10 @@ class TestPodcastDatabase(unittest.TestCase):
             os.utime(full_path, (now + 100 * index, now + 100 * index))
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts()
+        database.update_podcasts()
 
-        database.Save(database_file)
-        contents = FileContents(database_file)
+        database.save(database_file)
+        contents = file_contents(database_file)
         want = "1\nknown_folder\nknown_folder\n4\n3\n"
         for index, episode in enumerate(episodes):
             full_path = pathlib.Path(podcast_folder, episode)
@@ -114,16 +114,16 @@ class TestPodcastDatabase(unittest.TestCase):
             )
         self.assertEqual(contents, want)
 
-        self.assertEqual(1, database.Load(database_file))
+        self.assertEqual(1, database.load(database_file))
 
         # Delete the folder and ensure we save nothing.
         shutil.rmtree(podcast_folder)
-        database.UpdatePodcasts()
+        database.update_podcasts()
 
-        database.Save(database_file)
-        self.assertEqual("0\n", FileContents(database_file))
+        database.save(database_file)
+        self.assertEqual("0\n", file_contents(database_file))
 
-    def testSaveAndLoad_PodcastRemoved(self) -> None:
+    def test_save_and_load_podcast_removed(self) -> None:
         known_folder = pathlib.Path("known_folder")
         podcast_folder = pathlib.Path(self.root, known_folder)
         os.mkdir(podcast_folder)
@@ -137,32 +137,32 @@ class TestPodcastDatabase(unittest.TestCase):
         for p in database.podcast_shows:
             p.next_index = 1
 
-        database.UpdatePodcasts()
+        database.update_podcasts()
 
         database_folder = tempfile.mkdtemp()
         database_file = pathlib.Path(database_folder, "database.txt")
-        database.Save(database_file)
+        database.save(database_file)
 
         self.assertEqual(
-            "1\nknown_folder\nknown_folder\n1\n0\n", FileContents(database_file)
+            "1\nknown_folder\nknown_folder\n1\n0\n", file_contents(database_file)
         )
 
-        self.assertEqual(1, database.Load(database_file))
+        self.assertEqual(1, database.load(database_file))
 
         # Now try to load the podcast database without this podcast and don't remove it.
         database = podcast_database.PodcastDatabase(self.root, [], False)
         with self.assertRaises(podcast_database.DatabaseLoadingError):
-            database.Load(database_file, lambda x: "don't remove")
+            database.load(database_file, lambda x: "don't remove")
 
         database = podcast_database.PodcastDatabase(self.root, [], False)
-        podcasts_loaded = database.Load(database_file, lambda x: "REMOVE")
+        podcasts_loaded = database.load(database_file, lambda x: "REMOVE")
         self.assertEqual(0, podcasts_loaded)
 
         # Ensure we now save an empty database.
-        database.Save(database_file)
-        self.assertEqual("0\n", FileContents(database_file))
+        database.save(database_file)
+        self.assertEqual("0\n", file_contents(database_file))
 
-    def testGetPodcastEpisodesByPriority(self) -> None:
+    def test_get_podcast_episodes_by_priority(self) -> None:
         known_folder = pathlib.Path("known_folder")
         podcast_folder = pathlib.Path(self.root, known_folder)
         os.mkdir(podcast_folder)
@@ -199,15 +199,15 @@ class TestPodcastDatabase(unittest.TestCase):
             os.utime(full_path, (utime, utime))
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        results = database.GetPodcastEpisodesByPriority(
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS - 1),
             user_prompt=lambda x: True,
         )
         self.assertEqual(expected_selected_episodes[0:1], results)
 
-        results = database.GetPodcastEpisodesByPriority(
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 2 - 1),
             user_prompt=lambda x: True,
         )
@@ -216,7 +216,7 @@ class TestPodcastDatabase(unittest.TestCase):
             results,
         )
 
-        results = database.GetPodcastEpisodesByPriority(
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(hours=10), user_prompt=lambda x: True
         )
         self.assertEqual(
@@ -224,16 +224,16 @@ class TestPodcastDatabase(unittest.TestCase):
             results,
         )
 
-    def testGetPodcastEpisodesByPriority_TestIgnore(self) -> None:
+    def test_get_podcast_episodes_by_priority_test_ignore(self) -> None:
         known_folder = pathlib.Path("known_folder")
         episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
-        show = self._CreatePodcastShow(known_folder, podcast_show.P1, episodes, 666)
+        show = self._create_podcast_show(known_folder, podcast_show.P1, episodes, 666)
         podcast_shows = [show]
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        results = database.GetPodcastEpisodesByPriority(
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(hours=10), user_prompt=lambda x: True
         )
 
@@ -242,8 +242,8 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("podcast_2.mp3", os.path.basename(results[1].path))
         self.assertEqual("podcast_3.mp3", os.path.basename(results[2].path))
 
-        first_episode = podcast_shows[0].FirstEpisode()
-        results = database.GetPodcastEpisodesByPriority(
+        first_episode = podcast_shows[0].first_episode()
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(hours=10),
             user_prompt=lambda x: True,
             files_to_ignore=[
@@ -254,15 +254,15 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("podcast_2.mp3", os.path.basename(results[0].path))
         self.assertEqual("podcast_3.mp3", os.path.basename(results[1].path))
 
-        all_episodes = podcast_shows[0].RemainingEpisodes()
-        results = database.GetPodcastEpisodesByPriority(
+        all_episodes = podcast_shows[0].remaining_episodes()
+        results = database.get_podcast_episodes_by_priority(
             datetime.timedelta(hours=10),
             user_prompt=lambda x: True,
             files_to_ignore=[x.path for x in all_episodes],
         )
         self.assertFalse(results)
 
-    def testGetOldestFiles(self) -> None:
+    def test_get_oldest_files(self) -> None:
         known_folder = pathlib.Path("known_folder")
         podcast_folder = pathlib.Path(self.root, known_folder)
         os.mkdir(podcast_folder)
@@ -282,13 +282,13 @@ class TestPodcastDatabase(unittest.TestCase):
             os.utime(full_path, (now + 100 * index, now + 100 * index))
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        results = database.GetOldestFiles(1)
+        results = database.get_oldest_files(1)
         self.assertEqual(1, len(results))
         self.assertEqual("podcast_1.mp3", os.path.basename(results[0].path))
 
-        results = database.GetOldestFiles(2)
+        results = database.get_oldest_files(2)
         self.assertEqual(2, len(results))
         self.assertEqual("podcast_1.mp3", os.path.basename(results[0].path))
         self.assertEqual(
@@ -297,21 +297,21 @@ class TestPodcastDatabase(unittest.TestCase):
             [str(x) for x in results],
         )
 
-        results = database.GetOldestFiles(3)
+        results = database.get_oldest_files(3)
         self.assertEqual(3, len(results))
         self.assertEqual("podcast_1.mp3", os.path.basename(results[0].path))
         self.assertEqual("podcast_2.mp3", os.path.basename(results[1].path))
         self.assertEqual("podcast_3.mp3", os.path.basename(results[2].path))
 
-        results = database.GetOldestFiles(4)
+        results = database.get_oldest_files(4)
         self.assertEqual(3, len(results), results)
         self.assertEqual("podcast_1.mp3", os.path.basename(results[0].path))
         self.assertEqual("podcast_2.mp3", os.path.basename(results[1].path))
         self.assertEqual("podcast_3.mp3", os.path.basename(results[2].path))
 
-        first_episode = podcast_shows[0].FirstEpisode()
+        first_episode = podcast_shows[0].first_episode()
         self.assertTrue(first_episode)
-        results = database.GetOldestFiles(
+        results = database.get_oldest_files(
             2,
             files_to_ignore=[
                 typing.cast(podcast_episode.PodcastEpisode, first_episode).path
@@ -321,7 +321,7 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("podcast_2.mp3", os.path.basename(results[0].path))
         self.assertEqual("podcast_3.mp3", os.path.basename(results[1].path))
 
-    def testGetOldestFilesFromMultiple(self) -> None:
+    def test_get_oldest_files_from_multiple(self) -> None:
         known_folder = pathlib.Path("known_folder")
         known_folder_2 = pathlib.Path("known_folder_2")
         podcast_folder = pathlib.Path(self.root, known_folder)
@@ -352,7 +352,7 @@ class TestPodcastDatabase(unittest.TestCase):
                 )
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         expected_episodes_by_age = [
             pathlib.Path(self.root, known_folder, episodes[0]),
@@ -364,12 +364,12 @@ class TestPodcastDatabase(unittest.TestCase):
         ]
 
         for i in range(1, len(expected_episodes_by_age) + 1):
-            results = database.GetOldestFiles(i)
+            results = database.get_oldest_files(i)
             self.assertEqual(i, len(results))
             for q in range(i):
                 self.assertEqual(expected_episodes_by_age[q], results[q].path)
 
-    def testRepeatedPath(self) -> None:
+    def test_repeated_path(self) -> None:
         known_folder = pathlib.Path("repeated_folder")
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -378,7 +378,7 @@ class TestPodcastDatabase(unittest.TestCase):
         with self.assertRaises(Exception):
             podcast_database.PodcastDatabase(pathlib.Path("root"), podcast_shows, False)
 
-    def testStats(self) -> None:
+    def test_stats(self) -> None:
         known_folder = pathlib.Path("known_folder")
         known_folder_2 = pathlib.Path("known_folder_2")
         podcast_folder = pathlib.Path(self.root, known_folder)
@@ -416,25 +416,25 @@ class TestPodcastDatabase(unittest.TestCase):
         )
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         history = pathlib.Path(self.root, "history")
-        database.UpdateRemainingTime(history, date=datetime.datetime(2020, 1, 1))
+        database.update_remaining_time(history, date=datetime.datetime(2020, 1, 1))
         want = f"As of 2020-01-01 00:00:00, the podcast episode backlog is 6 episodes with total duration {test_utils.TEST_FILE_LENGTH_IN_SECONDS*6}s\n"
-        self.assertEqual(want, FileContents(history))
+        self.assertEqual(want, file_contents(history))
 
         stats = pathlib.Path(self.root, "stats")
-        database.LogStats(stats)
+        database.log_stats(stats)
         want = (
             f"known_folder: total duration of {test_utils.TEST_FILE_LENGTH_IN_SECONDS*3}s, 3 episodes, {test_utils.TEST_FILE_LENGTH_IN_SECONDS}s long on average\n"
             f"known_folder_2: total duration of {test_utils.TEST_FILE_LENGTH_IN_SECONDS*3}s, 3 episodes, {test_utils.TEST_FILE_LENGTH_IN_SECONDS}s long on average\n"
         )
-        self.assertEqual(want, FileContents(stats))
+        self.assertEqual(want, file_contents(stats))
 
-    def testGetSpecifiedFiles(self) -> None:
+    def test_get_specified_files(self) -> None:
         show_1_path = pathlib.Path(self.root, "show_1")
         show_1_episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
-        show_1 = self._CreatePodcastShow(
+        show_1 = self._create_podcast_show(
             show_1_path, podcast_show.P1, show_1_episodes, 666
         )
 
@@ -444,30 +444,30 @@ class TestPodcastDatabase(unittest.TestCase):
             "show_2_podcast_2.mp3",
             "show_2_podcast_3.mp3",
         ]
-        show_2 = self._CreatePodcastShow(
+        show_2 = self._create_podcast_show(
             show_2_path, podcast_show.P1, show_2_episodes, 666
         )
 
         podcast_shows = [show_1, show_2]
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         files_to_get = {
             show_1_path: [pathlib.Path(show_1_path, show_1_episodes[1])],
             show_2_path: [pathlib.Path(show_2_path, show_2_episodes[2])],
         }
 
-        files = database.GetSpecifiedFiles(files_to_get)
+        files = database.get_specified_files(files_to_get)
         expected_files = [
-            show_1.GetEpisode(pathlib.Path(show_1_path, show_1_episodes[1])),
-            show_2.GetEpisode(pathlib.Path(show_2_path, show_2_episodes[2])),
+            show_1.get_episode(pathlib.Path(show_1_path, show_1_episodes[1])),
+            show_2.get_episode(pathlib.Path(show_2_path, show_2_episodes[2])),
         ]
         self.assertCountEqual(expected_files, files)
 
-    def testGetSpecifiedFilesInIgnoreList(self) -> None:
+    def test_get_specified_files_in_ignore_list(self) -> None:
         show_1_path = pathlib.Path(self.root, "show_1")
         show_1_episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
-        show_1 = self._CreatePodcastShow(
+        show_1 = self._create_podcast_show(
             show_1_path, podcast_show.P1, show_1_episodes, 666
         )
 
@@ -477,61 +477,61 @@ class TestPodcastDatabase(unittest.TestCase):
             "show_2_podcast_2.mp3",
             "show_2_podcast_3.mp3",
         ]
-        show_2 = self._CreatePodcastShow(
+        show_2 = self._create_podcast_show(
             show_2_path, podcast_show.P1, show_2_episodes, 666
         )
 
         podcast_shows = [show_1, show_2]
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         files_to_get = {
             show_1_path: [pathlib.Path(show_1_path, show_1_episodes[1])],
             show_2_path: [pathlib.Path(show_2_path, show_2_episodes[2])],
         }
 
-        files = database.GetSpecifiedFiles(
+        files = database.get_specified_files(
             files_to_get,
             files_to_ignore=[pathlib.Path(show_1_path, show_1_episodes[1])],
         )
         expected_files = [
-            show_2.GetEpisode(pathlib.Path(show_2_path, show_2_episodes[2])),
+            show_2.get_episode(pathlib.Path(show_2_path, show_2_episodes[2])),
         ]
         self.assertCountEqual(expected_files, files)
 
-    def testGetSpecifiedFilesMissingShow(self) -> None:
+    def test_get_specified_files_missing_show(self) -> None:
         show_1_path = pathlib.Path(self.root, "show_1")
         show_1_episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
-        show_1 = self._CreatePodcastShow(
+        show_1 = self._create_podcast_show(
             show_1_path, podcast_show.P1, show_1_episodes, 666
         )
 
         podcast_shows = [show_1]
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         files_to_get = {
             pathlib.Path("Fake_show"): [pathlib.Path(show_1_path, show_1_episodes[0])]
         }
 
         with self.assertRaises(podcast_database.PodcastShowPathError):
-            database.GetSpecifiedFiles(files_to_get)
+            database.get_specified_files(files_to_get)
 
-    def testGetSpecifiedFilesMissingEpisodes(self) -> None:
+    def test_get_specified_files_missing_episodes(self) -> None:
         show_1_path = pathlib.Path(self.root, "show_1")
         show_1_episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
-        show_1 = self._CreatePodcastShow(
+        show_1 = self._create_podcast_show(
             show_1_path, podcast_show.P1, show_1_episodes, 666
         )
 
         podcast_shows = [show_1]
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
         files_to_get = {show_1_path: [pathlib.Path("fake_path")]}
 
         with self.assertRaises(podcast_database.PodcastEpisodePathError):
-            database.GetSpecifiedFiles(files_to_get)
+            database.get_specified_files(files_to_get)
 
 
 if __name__ == "__main__":

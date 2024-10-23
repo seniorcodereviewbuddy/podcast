@@ -43,7 +43,7 @@ class AndroidEmulator:
         # in case there is an issue.
         self.emulator_process.wait(MAX_TIMEOUT_FOR_EMULATOR_TO_CLOSE)
 
-    def WaitUntilReady(self) -> None:
+    def wait_until_ready(self) -> None:
         if self.device_ready:
             return
 
@@ -65,15 +65,15 @@ class AndroidEmulator:
 
         self.device_ready = True
 
-    def CreateNewPodcastFolder(self) -> pathlib.Path:
+    def create_new_podcast_folder(self) -> pathlib.Path:
         # We have to wait for the phone to be ready as we can't create the folder if it isn't.
-        self.WaitUntilReady()
+        self.wait_until_ready()
 
         args = ["adb", "-s", self.id, "shell", "mktemp", "-d"]
         results = subprocess.run(args, text=True, stdout=subprocess.PIPE, check=True)
         return pathlib.Path(results.stdout.strip())
 
-    def DeleteFiles(self, files: list[str]) -> None:
+    def delete_files(self, files: list[str]) -> None:
         for file in files:
             args = ["adb", "-s", self.id, "shell", "rm", f"'{file}'"]
             subprocess.run(args, text=True, stdout=subprocess.PIPE, check=True)

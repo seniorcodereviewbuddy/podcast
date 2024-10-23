@@ -9,7 +9,7 @@ FFMPEG_EXE = "ffmpeg.exe"
 LOUDNESS_TARGET = -10.0
 
 
-def _ConvertFile(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
+def _convert_file(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
     print("Converting %s to %s" % (input_file, output_file))
     stream = ffmpeg.input(str(input_file))
     stream = ffmpeg.output(stream, str(output_file))
@@ -21,16 +21,16 @@ def _ConvertFile(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
     print("Done conversion")
 
 
-def ConvertMatchingFileTypesInFolder(
+def convert_matching_file_types_in_folder(
     folder: pathlib.Path, input_file_type: str, output_file_type: str
 ) -> None:
     for file in folder.iterdir():
         ext = file.suffix.lower()
         if ext.lower() == input_file_type:
-            _ConvertFile(file, file.with_suffix(output_file_type))
+            _convert_file(file, file.with_suffix(output_file_type))
 
 
-def CreateAdjustedPodcastForPlayback(
+def create_adjusted_podcast_for_playback(
     input_file: pathlib.Path, output_file: pathlib.Path, speed: float
 ) -> None:
     stream = ffmpeg.input(str(input_file))

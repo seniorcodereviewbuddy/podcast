@@ -1,3 +1,2 @@
 [lint]
 select = ["N"]
-ignore = ["N802"]

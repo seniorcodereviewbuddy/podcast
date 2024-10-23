@@ -3,7 +3,7 @@ import typing
 PromptYesOrNo_Alias = typing.Callable[[str], bool]
 
 
-def PromptYesOrNo(user_prompt: str) -> bool:
+def prompt_yes_or_no(user_prompt: str) -> bool:
     while True:
         print(user_prompt + "\n(Y/N)? ", end="")
         result = input()

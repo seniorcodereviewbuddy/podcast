@@ -1,4 +1,4 @@
-def SecondsToString(seconds: float) -> str:
+def seconds_to_string(seconds: float) -> str:
     days, remainder = divmod(seconds, 3600 * 24)
     hours, remainder = divmod(remainder, 3600)
     minutes, seconds = divmod(remainder, 60)

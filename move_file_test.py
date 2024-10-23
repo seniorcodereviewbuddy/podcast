@@ -36,7 +36,7 @@ class TestMoveFile(unittest.TestCase):
     def tearDown(self) -> None:
         self.holding_dir.cleanup()
 
-    def testDryRunArchive(self) -> None:
+    def test_dry_run_archive(self) -> None:
         args = [
             "--dry-run",
             "--archive-destination",
@@ -55,7 +55,7 @@ class TestMoveFile(unittest.TestCase):
         self.assertFalse(os.path.isfile(self.destination_podcast_path))
         self.assertFalse(os.path.isfile(self.archived_podcast_path))
 
-    def testDryRunNoArchive(self) -> None:
+    def test_dry_run_no_archive(self) -> None:
         args = [
             "--dry-run",
             "--file-path",
@@ -72,7 +72,7 @@ class TestMoveFile(unittest.TestCase):
         self.assertFalse(os.path.isfile(self.destination_podcast_path))
         self.assertFalse(os.path.isfile(self.archived_podcast_path))
 
-    def testProdRunArchive(self) -> None:
+    def test_prod_run_archive(self) -> None:
         args = [
             "--archive-destination",
             str(self.archived_podcast_path),
@@ -91,13 +91,13 @@ class TestMoveFile(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.archived_podcast_path))
 
         self.assertEqual(
-            "new_title", audio_metadata.GetTitle(self.destination_podcast_path)
+            "new_title", audio_metadata.get_title(self.destination_podcast_path)
         )
         self.assertEqual(
-            "new_album", audio_metadata.GetAlbum(self.destination_podcast_path)
+            "new_album", audio_metadata.get_album(self.destination_podcast_path)
         )
 
-    def testProdRunNoArchive(self) -> None:
+    def test_prod_run_no_archive(self) -> None:
         args = [
             "--file-path",
             str(self.podcast_file),
@@ -114,10 +114,10 @@ class TestMoveFile(unittest.TestCase):
         self.assertFalse(os.path.isfile(self.archived_podcast_path))
 
         self.assertEqual(
-            "new_title", audio_metadata.GetTitle(self.destination_podcast_path)
+            "new_title", audio_metadata.get_title(self.destination_podcast_path)
         )
         self.assertEqual(
-            "new_album", audio_metadata.GetAlbum(self.destination_podcast_path)
+            "new_album", audio_metadata.get_album(self.destination_podcast_path)
         )
 
 

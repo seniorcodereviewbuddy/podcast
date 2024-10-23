@@ -23,7 +23,7 @@ import user_input
 ROOT_DIR = os.path.dirname(__file__)
 
 
-def FindUnknownFolders(
+def find_unknown_folders(
     root: pathlib.Path, podcast_shows: typing.List[podcast_show.PodcastShow]
 ) -> typing.List[pathlib.Path]:
     unknown_folders = []
@@ -43,15 +43,15 @@ def FindUnknownFolders(
     return unknown_folders
 
 
-def _GenerateTitle(file: pathlib.Path, title_prefix: str) -> str:
-    current_title = audio_metadata.GetTitle(file)
+def _generate_title(file: pathlib.Path, title_prefix: str) -> str:
+    current_title = audio_metadata.get_title(file)
     if current_title:
         return title_prefix + current_title
 
     return title_prefix + os.path.basename(file)
 
 
-def ProcessAndMoveFilesOver(
+def process_and_move_files_over(
     files: typing.List[full_podcast_episode.FullPodcastEpisode],
     destination: pathlib.Path,
     archive_folder: pathlib.Path,
@@ -89,7 +89,7 @@ def ProcessAndMoveFilesOver(
             q: queue.Queue[str] = queue.Queue()
 
             title_prefix = "%04d_" % (file.index) if file.index else ""
-            title = _GenerateTitle(file.path, title_prefix)
+            title = _generate_title(file.path, title_prefix)
 
             album = file.path.parent.name
 
@@ -136,14 +136,14 @@ def ProcessAndMoveFilesOver(
                 raise Exception("Failed to delete all files")
 
 
-def GetBatchofPodcastFiles(
+def get_batch_of_podcast_files(
     database: podcast_database.PodcastDatabase,
     duration_limit: datetime.timedelta,
     num_oldest_files_to_get: int = 0,
     required_files: typing.Optional[
         typing.Dict[pathlib.Path, typing.List[pathlib.Path]]
     ] = None,
-    user_prompt: user_input.PromptYesOrNo_Alias = user_input.PromptYesOrNo,
+    user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
 ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
     """
     GetBatchofPodcastFiles returns |duration_limit| time of podcasts.
@@ -152,11 +152,11 @@ def GetBatchofPodcastFiles(
     If we haven't passed the requested duration, it will add podcasts in
     priority order until it is just over the duration limit.
     """
-    files = database.GetOldestFiles(num_oldest_files_to_get)
+    files = database.get_oldest_files(num_oldest_files_to_get)
 
     required_files = required_files if required_files else {}
     files.extend(
-        database.GetSpecifiedFiles(
+        database.get_specified_files(
             required_files, files_to_ignore=[x.path for x in files]
         )
     )
@@ -165,7 +165,7 @@ def GetBatchofPodcastFiles(
     priority_duration = duration_limit - time_so_far
 
     files.extend(
-        database.GetPodcastEpisodesByPriority(
+        database.get_podcast_episodes_by_priority(
             priority_duration, user_prompt, files_to_ignore=[x.path for x in files]
         )
     )
@@ -182,8 +182,8 @@ def main(
     parser.add_argument("--verbose", action="store_true")
     parsed_args = parser.parse_args(args)
 
-    unknown_folders = FindUnknownFolders(
-        user_settings.PodcastFolder, user_settings.Podcasts
+    unknown_folders = find_unknown_folders(
+        user_settings.podcast_folder, user_settings.podcasts
     )
     if unknown_folders:
         # TODO: Ideally this should return an error for tests.
@@ -196,33 +196,35 @@ def main(
         return
 
     database = podcast_database.PodcastDatabase(
-        user_settings.PodcastFolder,
-        user_settings.Podcasts,
+        user_settings.podcast_folder,
+        user_settings.podcasts,
         parsed_args.verbose,
     )
-    database.Load(user_settings.PodcastDatabase)
+    database.load(user_settings.podcast_database)
 
-    database.UpdatePodcasts()
+    database.update_podcasts()
     if parsed_args.dry_run:
         print("Skipping database update for dry run")
     else:
-        database.Save(user_settings.PodcastDatabase)
-        database.UpdateRemainingTime(user_settings.PodcastHistory)
-        database.LogStats(user_settings.PodcastStats)
+        database.save(user_settings.podcast_database)
+        database.update_remaining_time(user_settings.podcast_history)
+        database.log_stats(user_settings.podcast_stats)
 
     phone = android_phone.AndroidPhone(
-        user_settings.AndroidPhoneID,
-        user_settings.PodcastDirectoryOnPhone,
-        user_settings.AndroidHistory,
+        user_settings.android_phone_id,
+        user_settings.podcast_directory_on_phone,
+        user_settings.android_history,
     )
-    phone.ConnectedToPhone()
+    phone.connected_to_phone()
 
-    time_in_hours = datetime.timedelta(hours=user_settings.TimeOfPodcastsToAddInHours)
-    unprocessed_files = GetBatchofPodcastFiles(
+    time_in_hours = datetime.timedelta(
+        hours=user_settings.time_of_podcasts_to_add_in_hours
+    )
+    unprocessed_files = get_batch_of_podcast_files(
         database,
         time_in_hours,
-        user_settings.NumOldestEpisodesToAdd,
-        user_settings.SpecifiedFiles,
+        user_settings.num_oldest_episodes_to_add,
+        user_settings.specified_files,
     )
 
     total_duration = sum((x.duration for x in unprocessed_files), datetime.timedelta())
@@ -238,9 +240,9 @@ def main(
         "\n%d files in total, duration of %s" % (len(unprocessed_files), total_duration)
     )
 
-    result = user_input.PromptYesOrNo(
+    result = user_input.prompt_yes_or_no(
         "Process files and move to '%s' before putting on phone: "
-        % user_settings.ProcessedFileBoardingZoneFolder
+        % user_settings.processed_file_boarding_zone_folder
     )
 
     if not result:
@@ -248,28 +250,28 @@ def main(
         return
 
     # TODO: Raise an exception if it exists and is a file?
-    if not user_settings.ProcessedFileBoardingZoneFolder.exists():
-        os.mkdir(user_settings.ProcessedFileBoardingZoneFolder)
+    if not user_settings.processed_file_boarding_zone_folder.exists():
+        os.mkdir(user_settings.processed_file_boarding_zone_folder)
 
-    ProcessAndMoveFilesOver(
+    process_and_move_files_over(
         unprocessed_files,
-        user_settings.ProcessedFileBoardingZoneFolder,
-        user_settings.ArchiveFolder,
+        user_settings.processed_file_boarding_zone_folder,
+        user_settings.archive_folder,
         parsed_args.dry_run,
     )
 
-    if phone.ConnectedToPhone():
+    if phone.connected_to_phone():
         processed_files = [
             pathlib.Path(
-                user_settings.ProcessedFileBoardingZoneFolder,
+                user_settings.processed_file_boarding_zone_folder,
                 podcast.path.name,
             )
             for podcast in unprocessed_files
         ]
-        copy_results = phone.CopyFilesToPhone(processed_files)
+        copy_results = phone.copy_files_to_phone(processed_files)
 
         local_backup = backup.Local(
-            user_settings.BackupFolder, user_settings.BackupHistory
+            user_settings.backup_folder, user_settings.backup_history
         )
 
         if copy_results.failed_to_copy:
@@ -277,17 +279,17 @@ def main(
                 f"WARNING: NOT ADDING {len(copy_results.failed_to_copy)} FILES TO BACKUP"
             )
             print(
-                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.ProcessedFileBoardingZoneFolder}"
+                f"THESE FILES WEREN'T COPIED OVER SUCCESSFULLY AND ARE BEING LEFT ALONE IN {user_settings.processed_file_boarding_zone_folder}"
             )
-        local_backup.MoveFilesToBackup(copy_results.copied)
+        local_backup.move_files_to_backup(copy_results.copied)
 
         try:
-            files_on_phone = phone.GetPodcastEpisodesOnPhone()
+            files_on_phone = phone.get_podcast_episodes_on_phone()
         except android_phone.AndroidConnectionError as e:
             print(e)
             print("Failed to see android phone, skipping folder back sync")
         else:
-            local_backup.RemoveUnneededBackupFiles(files_on_phone)
+            local_backup.remove_unneeded_backup_files(files_on_phone)
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ class IntegrationTestAndroidPhone(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.phone_emulator = android_emulator.AndroidEmulator()
-        cls.phone_emulator.WaitUntilReady()
+        cls.phone_emulator.wait_until_ready()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -27,7 +27,7 @@ class IntegrationTestAndroidPhone(unittest.TestCase):
         self.android_history_log_file.close()
 
         self.phone_folder = (
-            IntegrationTestAndroidPhone.phone_emulator.CreateNewPodcastFolder()
+            IntegrationTestAndroidPhone.phone_emulator.create_new_podcast_folder()
         )
 
         self.phone = android_phone.AndroidPhone(
@@ -39,7 +39,7 @@ class IntegrationTestAndroidPhone(unittest.TestCase):
     def tearDown(self) -> None:
         self.root.cleanup()
 
-    def testCopyFilesToCopyFilesToPhone(self) -> None:
+    def test_copy_files_to_copy_files_to_phone(self) -> None:
         files_to_copy = [
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
             pathlib.Path(
@@ -48,11 +48,11 @@ class IntegrationTestAndroidPhone(unittest.TestCase):
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.M4A_NO_TITLE_NO_ALBUM),
         ]
 
-        results = self.phone.CopyFilesToPhone(files_to_copy)
+        results = self.phone.copy_files_to_phone(files_to_copy)
         self.assertCountEqual([], results.failed_to_copy)
         self.assertCountEqual(files_to_copy, results.copied)
 
-    def testGetPodcastEpisodesOnPhone(self) -> None:
+    def test_get_podcast_episodes_on_phone(self) -> None:
         files_to_copy = [
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
             pathlib.Path(
@@ -63,15 +63,15 @@ class IntegrationTestAndroidPhone(unittest.TestCase):
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.M4A_NO_TITLE_NO_ALBUM),
         ]
 
-        self.assertCountEqual(self.phone.GetPodcastEpisodesOnPhone(), [])
+        self.assertCountEqual(self.phone.get_podcast_episodes_on_phone(), [])
 
-        results = self.phone.CopyFilesToPhone(files_to_copy)
+        results = self.phone.copy_files_to_phone(files_to_copy)
         self.assertCountEqual([], results.failed_to_copy)
         self.assertCountEqual(files_to_copy, results.copied)
 
         expected_files_on_phone = [x.name for x in files_to_copy]
         self.assertCountEqual(
-            self.phone.GetPodcastEpisodesOnPhone(), expected_files_on_phone
+            self.phone.get_podcast_episodes_on_phone(), expected_files_on_phone
         )
 
 

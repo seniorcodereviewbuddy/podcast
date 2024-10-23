@@ -10,7 +10,7 @@ import test_utils
 
 
 class TestHelper(unittest.TestCase):
-    def testPrepareAudioAndMoveMP3(self) -> None:
+    def test_prepare_audio_and_move_mp3(self) -> None:
         root = tempfile.mkdtemp()
         podcast_folder = pathlib.Path(root, "podcast")
         os.mkdir(podcast_folder)
@@ -21,15 +21,15 @@ class TestHelper(unittest.TestCase):
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE), full_path
         )
 
-        helper.PrepareAudioAndMove(
+        helper.prepare_audio_and_move(
             full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
-        self.assertEqual("new_title", audio_metadata.GetTitle(final_full_path))
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("new_title", audio_metadata.get_title(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
-    def testListTitleAndAlbum(self) -> None:
+    def test_list_title_and_album(self) -> None:
         root = tempfile.mkdtemp()
         podcast_folder = pathlib.Path(root, "podcast")
         os.mkdir(podcast_folder)
@@ -41,18 +41,18 @@ class TestHelper(unittest.TestCase):
             full_path,
         )
 
-        helper.PrepareAudioAndMove(
+        helper.prepare_audio_and_move(
             full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
         self.assertEqual(
             "new_title",
-            audio_metadata.GetTitle(final_full_path),
+            audio_metadata.get_title(final_full_path),
         )
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
-    def testListTitleAndAlbumAfterNoTitleOrAlbum(self) -> None:
+    def test_list_title_and_album_after_no_title_or_album(self) -> None:
         root = tempfile.mkdtemp()
         podcast_folder = pathlib.Path(root, "podcast")
         os.mkdir(podcast_folder)
@@ -64,16 +64,16 @@ class TestHelper(unittest.TestCase):
             full_path,
         )
 
-        helper.PrepareAudioAndMove(
+        helper.prepare_audio_and_move(
             full_path, final_full_path, "new_title", "podcast album", 1.0
         )
         self.assertFalse(os.path.exists(full_path))
         self.assertTrue(os.path.exists(final_full_path))
         self.assertEqual(
             "new_title",
-            audio_metadata.GetTitle(final_full_path),
+            audio_metadata.get_title(final_full_path),
         )
-        self.assertEqual("podcast album", audio_metadata.GetAlbum(final_full_path))
+        self.assertEqual("podcast album", audio_metadata.get_album(final_full_path))
 
 
 if __name__ == "__main__":

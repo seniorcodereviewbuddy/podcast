@@ -10,17 +10,17 @@ class Local:
         self.backup_folder = backup_folder
         self.backup_history = backup_history
 
-    def MoveFilesToBackup(self, files: set[pathlib.Path]) -> None:
+    def move_files_to_backup(self, files: set[pathlib.Path]) -> None:
         with open(self.backup_history, "a", encoding="utf-8") as f:
             for file in files:
                 dest = pathlib.Path(self.backup_folder, file.name)
                 file.rename(dest)
                 f.write(f"Copied {file} to backup folder")
 
-    def RemoveUnneededBackupFiles(
+    def remove_unneeded_backup_files(
         self,
         current_files_to_backup: typing.Set[str],
-        user_prompt: user_input.PromptYesOrNo_Alias = user_input.PromptYesOrNo,
+        user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
     ) -> None:
         for file in self.backup_folder.iterdir():
             if not file.is_file():

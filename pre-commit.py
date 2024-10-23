@@ -14,7 +14,7 @@ ROOT_FOLDER = os.path.dirname(__file__)
 EXPECTED_ENCODING = "utf-8"
 
 
-def RunProcess(args: list[str]) -> subprocess.CompletedProcess[str]:
+def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
     # Send the output through print directly here, otherwise there were odd flushing races with the other prints.
     encoding = "utf-8"
     result = subprocess.run(
