@@ -86,63 +86,63 @@ class Settings(object):
         self._SPECIFIED_FILES = specified_files
 
     @property
-    def AndroidPhoneID(self) -> str:
+    def android_phone_i_d(self) -> str:
         return self._ANDROID_PHONE_ID
 
     @property
-    def PodcastFolder(self) -> pathlib.Path:
+    def podcast_folder(self) -> pathlib.Path:
         return self._PODCAST_FOLDER
 
     @property
-    def ProcessedFileBoardingZoneFolder(self) -> pathlib.Path:
+    def processed_file_boarding_zone_folder(self) -> pathlib.Path:
         return self._PROCESSED_FILE_BOARDING_ZONE_FOLDER
 
     @property
-    def ArchiveFolder(self) -> pathlib.Path:
+    def archive_folder(self) -> pathlib.Path:
         return self._ARCHIVE_FOLDER
 
     @property
-    def BackupFolder(self) -> pathlib.Path:
+    def backup_folder(self) -> pathlib.Path:
         return self._BACKUP_FOLDER
 
     @property
-    def PodcastDirectoryOnPhone(self) -> pathlib.Path:
+    def podcast_directory_on_phone(self) -> pathlib.Path:
         return self._PODCAST_DIRECTORY_ON_PHONE
 
     @property
-    def NumOldestEpisodesToAdd(self) -> int:
+    def num_oldest_episodes_to_add(self) -> int:
         return self._NUM_OLDEST_EPISODES_TO_ADD
 
     @property
-    def TimeOfPodcastsToAddInHours(self) -> int:
+    def time_of_podcasts_to_add_in_hours(self) -> int:
         return self._TIME_OF_PODCASTS_TO_ADD_IN_HOURS
 
     @property
-    def Podcasts(self) -> typing.List[podcast_show.PodcastShow]:
+    def podcasts(self) -> typing.List[podcast_show.PodcastShow]:
         return self._PODCASTS
 
     @property
-    def SpecifiedFiles(self) -> typing.Dict[pathlib.Path, typing.List[pathlib.Path]]:
+    def specified_files(self) -> typing.Dict[pathlib.Path, typing.List[pathlib.Path]]:
         return self._SPECIFIED_FILES
 
     @property
-    def AndroidHistory(self) -> pathlib.Path:
+    def android_history(self) -> pathlib.Path:
         return pathlib.Path(self._USER_DATA_FOLDER, "android_history.txt")
 
     @property
-    def BackupHistory(self) -> pathlib.Path:
+    def backup_history(self) -> pathlib.Path:
         return pathlib.Path(self._USER_DATA_FOLDER, "android_history.txt")
 
     @property
-    def PodcastDatabase(self) -> pathlib.Path:
+    def podcast_database(self) -> pathlib.Path:
         return pathlib.Path(self._USER_DATA_FOLDER, "podcast.db")
 
     @property
-    def PodcastHistory(self) -> pathlib.Path:
+    def podcast_history(self) -> pathlib.Path:
         return pathlib.Path(self._USER_DATA_FOLDER, "history.txt")
 
     @property
-    def PodcastStats(self) -> pathlib.Path:
+    def podcast_stats(self) -> pathlib.Path:
         return pathlib.Path(self._USER_DATA_FOLDER, "stats.txt")
 
 

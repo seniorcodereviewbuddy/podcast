@@ -23,7 +23,7 @@ class TestPodcast(unittest.TestCase):
     def tearDown(self) -> None:
         self._root_directory.cleanup()
 
-    def testScan(self) -> None:
+    def test_scan(self) -> None:
         podcast_folder = pathlib.Path(self.root, "podcast")
         os.mkdir(podcast_folder)
 
@@ -44,19 +44,19 @@ class TestPodcast(unittest.TestCase):
             now += 10000
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        self.assertEqual([], p.RemainingEpisodes())
+        self.assertEqual([], p.remaining_episodes())
 
-        p.ScanForUpdates(self.root, allow_prompt=False)
+        p.scan_for_updates(self.root, allow_prompt=False)
 
-        self.assertEqual(len(files), len(p.RemainingEpisodes()))
+        self.assertEqual(len(files), len(p.remaining_episodes()))
         self.assertEqual(
-            test_utils.TEST_FILE_LENGTH_IN_SECONDS * len(files), p.RemainingTime()
+            test_utils.TEST_FILE_LENGTH_IN_SECONDS * len(files), p.remaining_time()
         )
 
         episodes: typing.List[podcast_episode.PodcastEpisode] = []
         for index, episode in enumerate(files):
             paths_to_ignore = [x.path for x in episodes]
-            next_episode = p.FirstEpisode(files_to_ignore=paths_to_ignore)
+            next_episode = p.first_episode(files_to_ignore=paths_to_ignore)
             self.assertIsNotNone(next_episode)
             episodes.append(next_episode)  # type:ignore
             self.assertEqual(episode, os.path.basename(episodes[-1].path))
@@ -66,33 +66,33 @@ class TestPodcast(unittest.TestCase):
             remaining_episodes = len(files) - len(episodes)
             self.assertEqual(
                 remaining_episodes,
-                len(p.RemainingEpisodes(files_to_ignore=paths_to_ignore)),
+                len(p.remaining_episodes(files_to_ignore=paths_to_ignore)),
             )
             self.assertEqual(
                 remaining_episodes * test_utils.TEST_FILE_LENGTH_IN_SECONDS,
-                p.RemainingTime(files_to_ignore=paths_to_ignore),
+                p.remaining_time(files_to_ignore=paths_to_ignore),
             )
 
         paths_to_ignore = [x.path for x in episodes]
-        self.assertIsNone(p.FirstEpisode(files_to_ignore=paths_to_ignore))
-        self.assertEqual(0, p.RemainingTime(files_to_ignore=paths_to_ignore))
+        self.assertIsNone(p.first_episode(files_to_ignore=paths_to_ignore))
+        self.assertEqual(0, p.remaining_time(files_to_ignore=paths_to_ignore))
 
-    def testSaveAndLoad(self) -> None:
+    def test_save_and_load(self) -> None:
         podcast_folder = pathlib.Path(self.root, "podcast")
         os.mkdir(podcast_folder)
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        self.assertEqual([], p.RemainingEpisodes())
+        self.assertEqual([], p.remaining_episodes())
 
         saved = io.StringIO()
-        p.Save(saved)
+        p.save(saved)
 
         want = "%s\nNone\n0\n" % (podcast_folder)
         self.assertEqual(want, saved.getvalue())
 
-        p.Load(io.StringIO(saved.getvalue()))
+        p.load(io.StringIO(saved.getvalue()))
         self.assertEqual(podcast_folder, p.podcast_folder)
-        self.assertEqual([], p.RemainingEpisodes())
+        self.assertEqual([], p.remaining_episodes())
 
         # Add a file and ensure it appears.
         podcast_file = pathlib.Path(podcast_folder, "podcast_1_c.mp3")
@@ -104,12 +104,12 @@ class TestPodcast(unittest.TestCase):
         os.utime(podcast_file, (now, now))
 
         self.assertEqual(
-            [podcast_file], p.ScanForUpdates(self.root, allow_prompt=False)
+            [podcast_file], p.scan_for_updates(self.root, allow_prompt=False)
         )
-        self.assertEqual([], p.ScanForUpdates(self.root, allow_prompt=False))
+        self.assertEqual([], p.scan_for_updates(self.root, allow_prompt=False))
 
         saved = io.StringIO()
-        p.Save(saved)
+        p.save(saved)
 
         want = "%s\n2\n1\n%s\n1\n%d\n%d\n" % (
             podcast_folder,
@@ -119,24 +119,24 @@ class TestPodcast(unittest.TestCase):
         )
         self.assertEqual(saved.getvalue(), want)
 
-        p.Load(io.StringIO(saved.getvalue()))
-        self.assertEqual(1, len(p.RemainingEpisodes()))
+        p.load(io.StringIO(saved.getvalue()))
+        self.assertEqual(1, len(p.remaining_episodes()))
 
         # Remove the file and ensure we revert back to the original state.
         os.remove(podcast_file)
 
-        self.assertEqual([], p.ScanForUpdates(self.root, allow_prompt=False))
+        self.assertEqual([], p.scan_for_updates(self.root, allow_prompt=False))
 
         saved = io.StringIO()
-        p.Save(saved)
+        p.save(saved)
 
         want = "%s\n2\n0\n" % (podcast_folder)
         self.assertEqual(want, saved.getvalue())
 
-        p.Load(io.StringIO(saved.getvalue()))
-        self.assertEqual(0, len(p.RemainingEpisodes()))
+        p.load(io.StringIO(saved.getvalue()))
+        self.assertEqual(0, len(p.remaining_episodes()))
 
-    def testPreprocess(self) -> None:
+    def test_preprocess(self) -> None:
         podcast_folder = pathlib.Path(self.root, "my_podcast")
         os.mkdir(podcast_folder)
 
@@ -148,7 +148,7 @@ class TestPodcast(unittest.TestCase):
         )
         self.assertTrue(podcast_file.is_file())
 
-        def clearFile(
+        def clear_file(
             folder: pathlib.Path,
             _lambda: podcast_preprocessing_base.DeletePrompt_TypeAlias,
         ) -> None:
@@ -157,14 +157,14 @@ class TestPodcast(unittest.TestCase):
         p = podcast_show.PodcastShow(
             pathlib.Path("my_podcast"), podcast_show.P0, preprocess=clearFile
         )
-        p.ScanForUpdates(self.root)
+        p.scan_for_updates(self.root)
         self.assertFalse(os.path.exists(podcast_file))
 
-    def testBadLoad(self) -> None:
+    def test_bad_load(self) -> None:
         p = podcast_show.PodcastShow(pathlib.Path("my_podcast"), podcast_show.P0)
-        self.assertIsNone(p.Load(io.StringIO("bad_podcast\n0\n")))
+        self.assertIsNone(p.load(io.StringIO("bad_podcast\n0\n")))
 
-    def testGetEpisodePresent(self) -> None:
+    def test_get_episode_present(self) -> None:
         podcast_folder = pathlib.Path(self.root, "podcast")
         os.mkdir(podcast_folder)
 
@@ -177,7 +177,7 @@ class TestPodcast(unittest.TestCase):
         os.utime(full_path, (now, now))
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        p.ScanForUpdates(self.root, allow_prompt=False)
+        p.scan_for_updates(self.root, allow_prompt=False)
 
         expected_value = full_podcast_episode.FullPodcastEpisode(
             1,
@@ -188,9 +188,9 @@ class TestPodcast(unittest.TestCase):
             datetime.datetime.fromtimestamp(now),
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS),
         )
-        self.assertEqual(expected_value, p.GetEpisode(full_path))
+        self.assertEqual(expected_value, p.get_episode(full_path))
 
-    def testGetEpisodeNotPresent(self) -> None:
+    def test_get_episode_not_present(self) -> None:
         podcast_folder = pathlib.Path(self.root, "podcast")
         os.mkdir(podcast_folder)
 
@@ -201,9 +201,9 @@ class TestPodcast(unittest.TestCase):
         )
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        p.ScanForUpdates(self.root, allow_prompt=False)
+        p.scan_for_updates(self.root, allow_prompt=False)
 
-        self.assertFalse(p.GetEpisode(pathlib.Path("fake_path")))
+        self.assertFalse(p.get_episode(pathlib.Path("fake_path")))
 
 
 if __name__ == "__main__":

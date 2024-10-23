@@ -62,7 +62,7 @@ class AndroidPhone(object):
                 filename = file.name
                 podcast = audio_metadata.get_album(file)
                 title = audio_metadata.get_title(file)
-                modified_time = podcast_episode.ModifiedTime(file)
+                modified_time = podcast_episode.modified_time(file)
                 readable_modified_time = datetime.datetime.fromtimestamp(
                     modified_time, tz=datetime.timezone.utc
                 )

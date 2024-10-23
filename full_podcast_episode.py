@@ -30,7 +30,7 @@ class FullPodcastEpisode(object):
             "FullPodcastEpisode(%s:(%s) with index %d from %s with speed %0.2f, archive %s and modification_time %s)"
             % (
                 self.path,
-                time_helper.SecondsToString(self.duration.seconds),
+                time_helper.seconds_to_string(self.duration.seconds),
                 self.index,
                 self.podcast_show_name,
                 self.speed,

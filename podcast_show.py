@@ -74,7 +74,7 @@ class PodcastShow(object):
             return NotImplemented
         return self.podcast_folder >= other.podcast_folder
 
-    def Load(self, f: typing.TextIO) -> typing.Optional["PodcastShow"]:
+    def load(self, f: typing.TextIO) -> typing.Optional["PodcastShow"]:
         loading_path = pathlib.Path(f.readline().strip())
         if loading_path != self.podcast_folder:
             print(
@@ -90,20 +90,20 @@ class PodcastShow(object):
             self.next_index = int(next_index)
         num_episodes = int(f.readline())
         self.episodes = [
-            podcast_episode.PodcastEpisode.Load(f) for x in range(num_episodes)
+            podcast_episode.PodcastEpisode.load(f) for x in range(num_episodes)
         ]
 
         return self
 
-    def Save(self, f: typing.TextIO) -> None:
+    def save(self, f: typing.TextIO) -> None:
         f.write(str(self.podcast_folder) + "\n")
         f.write(str(self.next_index) + "\n")
         f.write(str(len(self.episodes)) + "\n")
         for episode in self.episodes:
-            episode.Save(f)
+            episode.save(f)
 
     # TODO: This feels like it shouldn't need root, the class should have it's full path, it doesn't need root.
-    def ScanForUpdates(
+    def scan_for_updates(
         self, root: pathlib.Path, allow_prompt: bool = True
     ) -> typing.List[pathlib.Path]:
         print("Scanning for Updates for %s" % (self.podcast_folder))
@@ -130,7 +130,7 @@ class PodcastShow(object):
         new_episodes = []
         for f in files_present.difference(known_files):
             full_path = pathlib.Path(full_folder_path, f).absolute()
-            if not podcast_episode.IsPodcastFile(full_path):
+            if not podcast_episode.is_podcast_file(full_path):
                 continue
 
             if "(2)" in str(f):
@@ -138,18 +138,18 @@ class PodcastShow(object):
             new_episodes.append(
                 (
                     full_path,
-                    podcast_episode.ModifiedTime(full_path),
+                    podcast_episode.modified_time(full_path),
                 )
             )
 
         new_episodes.sort(key=lambda x: x[1])
 
         for path, _time in new_episodes:
-            self.AddEpisode(path, allow_prompt=allow_prompt)
+            self.add_episode(path, allow_prompt=allow_prompt)
 
         return [x[0] for x in new_episodes]
 
-    def GetEpisode(
+    def get_episode(
         self, path: pathlib.Path
     ) -> typing.Optional[full_podcast_episode.FullPodcastEpisode]:
         for episode in self.episodes:
@@ -157,7 +157,7 @@ class PodcastShow(object):
                 return self._EpisodeAsFullPodcastEpisode(episode)
         return None
 
-    def AddEpisode(self, path: pathlib.Path, allow_prompt: bool = True) -> None:
+    def add_episode(self, path: pathlib.Path, allow_prompt: bool = True) -> None:
         if self.next_index is None:
             if allow_prompt and not user_input.prompt_yes_or_no(
                 "Initialize next_index to 1 for %s" % (self.podcast_folder)
@@ -166,7 +166,7 @@ class PodcastShow(object):
             else:
                 self.next_index = 1
 
-        self.episodes.append(podcast_episode.PodcastEpisode.New(path, self.next_index))
+        self.episodes.append(podcast_episode.PodcastEpisode.new(path, self.next_index))
         self.next_index += 1
 
     def _EpisodesWithoutIgnores(
@@ -191,7 +191,7 @@ class PodcastShow(object):
             duration=datetime.timedelta(seconds=episode.duration),
         )
 
-    def FirstEpisode(
+    def first_episode(
         self,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.Optional[full_podcast_episode.FullPodcastEpisode]:
@@ -206,7 +206,7 @@ class PodcastShow(object):
 
         return self._EpisodeAsFullPodcastEpisode(first_podcast)
 
-    def RemainingEpisodes(
+    def remaining_episodes(
         self,
         files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> typing.List[full_podcast_episode.FullPodcastEpisode]:
@@ -215,7 +215,7 @@ class PodcastShow(object):
             for x in self._EpisodesWithoutIgnores(files_to_ignore)
         ]
 
-    def RemainingTime(
+    def remaining_time(
         self, files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None
     ) -> int:
         duration = 0

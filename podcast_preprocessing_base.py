@@ -7,7 +7,7 @@ DeletePrompt_TypeAlias = typing.Callable[[pathlib.Path], bool]
 PreProcess_TypeAlias = typing.Callable[[pathlib.Path, DeletePrompt_TypeAlias], None]
 
 
-def PromptForDelete(file: pathlib.Path) -> bool:
+def prompt_for_delete(file: pathlib.Path) -> bool:
     return user_input.prompt_yes_or_no("Do you want to delete %s" % file)
 
 

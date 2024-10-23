@@ -8,7 +8,7 @@ import full_podcast_episode
 
 
 class TestFullPodcastEpisode(unittest.TestCase):
-    def testEquality(self) -> None:
+    def test_equality(self) -> None:
         selected = full_podcast_episode.FullPodcastEpisode(
             index=1,
             path=pathlib.Path("Test/Path"),
@@ -50,7 +50,7 @@ class TestFullPodcastEpisode(unittest.TestCase):
         wrong_duration.duration += datetime.timedelta(hours=1)
         self.assertNotEqual(selected, wrong_duration)
 
-    def testStr(self) -> None:
+    def test_str(self) -> None:
         selected = full_podcast_episode.FullPodcastEpisode(
             index=1,
             path=pathlib.Path("Test/Path"),

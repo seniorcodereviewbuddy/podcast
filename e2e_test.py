@@ -36,7 +36,7 @@ class TestE2E(unittest.TestCase):
     def tearDown(self) -> None:
         self.root.cleanup()
 
-    def DefaultShows(self) -> list[podcast_show.PodcastShow]:
+    def default_shows(self) -> list[podcast_show.PodcastShow]:
         # TODO: Maybe these shouldn't be living in the same folder? Or they should be
         # handled in a better way.
         return [
@@ -51,7 +51,7 @@ class TestE2E(unittest.TestCase):
             ),
         ]
 
-    def CreateTestSettings(
+    def create_test_settings(
         self,
         phone_id: str,
         android_podcast_folder: pathlib.Path,
@@ -145,7 +145,7 @@ class TestE2E(unittest.TestCase):
         args: list[str] = []
         podcast_folder = pathlib.Path(self.root.name, "Podcasts")
         podcast_folder.mkdir()
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
@@ -169,13 +169,13 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
 
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.DefaultShows() + [
+        podcast_shows = self.default_shows() + [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
         episodes = self._PopulatePodcastShow(podcast_show_folder)
 
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
@@ -224,13 +224,13 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
 
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.DefaultShows() + [
+        podcast_shows = self.default_shows() + [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
         episodes = self._PopulatePodcastShow(podcast_show_folder)
 
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
@@ -273,13 +273,13 @@ class TestE2E(unittest.TestCase):
         podcast_folder = pathlib.Path(self.root.name, "Podcasts")
         podcast_folder.mkdir()
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.DefaultShows() + [
+        podcast_shows = self.default_shows() + [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
         episodes = self._PopulatePodcastShow(podcast_show_folder)
 
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
@@ -324,11 +324,11 @@ class TestE2E(unittest.TestCase):
         episodes = self._PopulatePodcastShow(podcast_show_folder)
 
         args: list[str] = []
-        podcast_shows = self.DefaultShows() + [
+        podcast_shows = self.default_shows() + [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,
@@ -373,7 +373,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
         podcast_show_folder = podcast_folder.joinpath("show_1")
 
-        podcast_shows = self.DefaultShows() + [
+        podcast_shows = self.default_shows() + [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
@@ -382,7 +382,7 @@ class TestE2E(unittest.TestCase):
             file_prefix="batch_1_",
         )
 
-        test_settings = self.CreateTestSettings(
+        test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
             podcast_folder,

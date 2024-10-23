@@ -12,7 +12,7 @@ class PodcastEpisodeLoadingError(Exception):
 
 
 # TODO: This is only called in PodcastShow, so maybe it should live there. It doesn't seem to really be episode specific.
-def IsPodcastFile(file: pathlib.Path) -> bool:
+def is_podcast_file(file: pathlib.Path) -> bool:
     ext = file.suffix.lower()
     # Ignore file with extensions we don't care about.
     if ext in (".db", ".jpg", ".jpeg", ".partial", ".png"):
@@ -28,7 +28,7 @@ def IsPodcastFile(file: pathlib.Path) -> bool:
     return file.is_file()
 
 
-def ModifiedTime(file: pathlib.Path) -> int:
+def modified_time(file: pathlib.Path) -> int:
     return int(file.stat()[stat.ST_MTIME])
 
 
@@ -42,10 +42,10 @@ class PodcastEpisode(object):
         self.modification_time = modification_time
 
     def __str__(self) -> str:
-        return "%s:(%s)" % (self.path, time_helper.SecondsToString(self.duration))
+        return "%s:(%s)" % (self.path, time_helper.seconds_to_string(self.duration))
 
     @classmethod
-    def New(cls, path: pathlib.Path, index: int) -> "PodcastEpisode":
+    def new(cls, path: pathlib.Path, index: int) -> "PodcastEpisode":
         try:
             source = pyglet.media.load(str(path))
         except EOFError as e:
@@ -54,12 +54,12 @@ class PodcastEpisode(object):
         if source.duration is None:
             raise Exception("File with unknown duration, %s", path)
         duration = int(source.duration)
-        modification_time = ModifiedTime(path)
+        modification_time = modified_time(path)
 
         return PodcastEpisode(path, index, duration, modification_time)
 
     @classmethod
-    def Load(cls, f: typing.TextIO) -> "PodcastEpisode":
+    def load(cls, f: typing.TextIO) -> "PodcastEpisode":
         path = pathlib.Path(f.readline().strip())
         try:
             index = int(f.readline().strip())
@@ -84,7 +84,7 @@ class PodcastEpisode(object):
 
         return PodcastEpisode(path, index, duration, modification_time)
 
-    def Save(self, f: typing.TextIO) -> None:
+    def save(self, f: typing.TextIO) -> None:
         f.write(str(self.path) + "\n")
         f.write(str(self.index) + "\n")
         f.write(str(self.duration) + "\n")

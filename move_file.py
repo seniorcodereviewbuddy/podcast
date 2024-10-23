@@ -37,7 +37,9 @@ def _UpdateFileandMoveOver(
         print("Dry run, would have moved %s to %s" % (file_source, file_destination))
         print("With album %s" % album)
     else:
-        helper.PrepareAudioAndMove(file_source, file_destination, title, album, speed)
+        helper.prepare_audio_and_move(
+            file_source, file_destination, title, album, speed
+        )
 
 
 def main(args: typing.Optional[typing.List[str]]) -> None:

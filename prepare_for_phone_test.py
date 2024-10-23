@@ -23,7 +23,7 @@ def _ListofFullPodcastEpisodesToListOfNames(
 def _GetXOldestEpisodes(
     show: podcast_show.PodcastShow, x: int
 ) -> list[full_podcast_episode.FullPodcastEpisode]:
-    episodes = show.RemainingEpisodes()
+    episodes = show.remaining_episodes()
 
     # Make sure they are in sorted order by age.
     sorted(episodes, key=lambda x: x.modification_time)
@@ -63,7 +63,7 @@ class TestPrepareForPhone(unittest.TestCase):
                 os.utime(episode_path, (new_time, new_time))
 
         show = podcast_show.PodcastShow(podcast_folder, priority)
-        show.ScanForUpdates(self.root, allow_prompt=False)
+        show.scan_for_updates(self.root, allow_prompt=False)
 
         return show
 
@@ -76,7 +76,7 @@ class TestPrepareForPhone(unittest.TestCase):
         unknown_folder = pathlib.Path("unknown_folder")
         os.mkdir(pathlib.Path(self.root, unknown_folder))
         self.assertEqual(
-            prepare_for_phone.FindUnknownFolders(
+            prepare_for_phone.find_unknown_folders(
                 self.root, podcast_shows=podcast_shows
             ),
             [unknown_folder],
@@ -90,7 +90,7 @@ class TestPrepareForPhone(unittest.TestCase):
         os.mkdir(pathlib.Path(self.root, known_folder))
 
         self.assertEqual(
-            prepare_for_phone.FindUnknownFolders(
+            prepare_for_phone.find_unknown_folders(
                 self.root, podcast_shows=podcast_shows
             ),
             [],
@@ -106,29 +106,29 @@ class TestPrepareForPhone(unittest.TestCase):
         unknown_folder = pathlib.Path("unknown_folder")
         os.mkdir(pathlib.Path(self.root, unknown_folder))
         self.assertEqual(
-            prepare_for_phone.FindUnknownFolders(
+            prepare_for_phone.find_unknown_folders(
                 self.root, podcast_shows=podcast_shows
             ),
             [unknown_folder],
         )
 
-    def test_ProcessAndMoveFilesOver(self) -> None:
+    def test_process_and_move_files_over(self) -> None:
         podcast_folder = pathlib.Path("podcast_show")
         podcast_test_show = self._CreatePodcastShow(podcast_folder, podcast_show.P1, 3)
         podcast_test_show.archive = archive.Archive.YES
 
-        database = podcast_database.PodcastDatabase(
+        database = podcast_database.podcast_database(
             self.root, [podcast_test_show], False
         )
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        unprocessed_files = podcast_test_show.RemainingEpisodes()
+        unprocessed_files = podcast_test_show.remaining_episodes()
 
         # Moved folder should be empty for dry run.
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
 
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
 
@@ -140,7 +140,7 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
@@ -160,17 +160,17 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_test_show = self._CreatePodcastShow(podcast_folder, podcast_show.P1, 3)
         podcast_test_show.archive = archive.Archive.NO
 
-        database = podcast_database.PodcastDatabase(
+        database = podcast_database.podcast_database(
             self.root, [podcast_test_show], False
         )
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        unprocessed_files = podcast_test_show.RemainingEpisodes()
+        unprocessed_files = podcast_test_show.remaining_episodes()
 
         # Moved folder should be empty for dry run.
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
         self.assertEqual(
@@ -185,7 +185,7 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
@@ -220,20 +220,20 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_test_show = podcast_show.PodcastShow(
             podcast_folder, podcast_show.P0, archive=archive.Archive.YES
         )
-        podcast_test_show.ScanForUpdates(self.root, allow_prompt=False)
+        podcast_test_show.scan_for_updates(self.root, allow_prompt=False)
 
-        database = podcast_database.PodcastDatabase(
+        database = podcast_database.podcast_database(
             self.root, [podcast_test_show], False
         )
-        database.UpdatePodcasts(allow_prompt=False)
+        database.update_podcasts(allow_prompt=False)
 
-        unprocessed_files = podcast_test_show.RemainingEpisodes()
+        unprocessed_files = podcast_test_show.remaining_episodes()
 
         # Moved folder should be empty for dry run.
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
 
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
 
@@ -245,7 +245,7 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.ProcessAndMoveFilesOver(
+        prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
@@ -272,10 +272,10 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
         podcast_shows = [priority_show, old_podcast_show]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS - 1),
             num_oldest_files_to_get=0,
@@ -284,7 +284,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(priority_show, 1)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 2 - 1),
             num_oldest_files_to_get=0,
@@ -293,7 +293,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(priority_show, 2)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 3 - 1),
             num_oldest_files_to_get=0,
@@ -317,10 +317,10 @@ class TestPrepareForPhone(unittest.TestCase):
             old_show,
             new_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS - 1),
             num_oldest_files_to_get=1,
@@ -329,7 +329,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(old_show, 1)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 2 - 1),
             num_oldest_files_to_get=2,
@@ -338,7 +338,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(old_show, 2)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 3 - 1),
             num_oldest_files_to_get=3,
@@ -362,10 +362,10 @@ class TestPrepareForPhone(unittest.TestCase):
             old_show,
             new_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 2 - 1),
             num_oldest_files_to_get=1,
@@ -376,7 +376,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 4 - 1),
             num_oldest_files_to_get=2,
@@ -402,10 +402,10 @@ class TestPrepareForPhone(unittest.TestCase):
             old_priority_show,
             new_low_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS - 1),
             num_oldest_files_to_get=1,
@@ -414,7 +414,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(old_priority_show, 1)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 3 - 1),
             num_oldest_files_to_get=1,
@@ -423,7 +423,7 @@ class TestPrepareForPhone(unittest.TestCase):
         expected_result = _GetXOldestEpisodes(old_priority_show, 3)
         self.assertCountEqual(files, expected_result)
 
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 4 - 1),
             num_oldest_files_to_get=1,
@@ -442,11 +442,11 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
         oldest_episode = _GetXOldestEpisodes(show, 1)
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=0),
             num_oldest_files_to_get=1,
@@ -467,11 +467,11 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
         oldest_episode = _GetXOldestEpisodes(show, 1)
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=0),
             num_oldest_files_to_get=0,
@@ -492,11 +492,11 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
         oldest_episodes = _GetXOldestEpisodes(show, 2)
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=0),
             num_oldest_files_to_get=1,
@@ -517,11 +517,11 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
         oldest_episodes = _GetXOldestEpisodes(show, 3)
-        files = prepare_for_phone.GetBatchofPodcastFiles(
+        files = prepare_for_phone.get_batchof_podcast_files(
             database,
             datetime.timedelta(seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 3 - 1),
             num_oldest_files_to_get=1,
@@ -542,11 +542,11 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
-        database.UpdatePodcasts(allow_prompt=False)
+        database = podcast_database.podcast_database(self.root, podcast_shows, False)
+        database.update_podcasts(allow_prompt=False)
 
         with self.assertRaises(podcast_database.PodcastEpisodePathError):
-            prepare_for_phone.GetBatchofPodcastFiles(
+            prepare_for_phone.get_batchof_podcast_files(
                 database,
                 datetime.timedelta(
                     seconds=test_utils.TEST_FILE_LENGTH_IN_SECONDS * 4 - 1

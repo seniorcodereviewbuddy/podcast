@@ -15,7 +15,7 @@ def touch(file: pathlib.Path) -> None:
 
 
 class TestPodcastEpisode(unittest.TestCase):
-    def testPodcastEpisodeNew(self) -> None:
+    def test_podcast_episode_new(self) -> None:
         podcast_folder = tempfile.mkdtemp()
         podcast_file = pathlib.Path(podcast_folder, "file.mp3")
         index = 10
@@ -25,14 +25,14 @@ class TestPodcastEpisode(unittest.TestCase):
             podcast_file,
         )
 
-        episode = podcast_episode.PodcastEpisode.New(podcast_file, index)
+        episode = podcast_episode.PodcastEpisode.new(podcast_file, index)
 
         self.assertEqual(podcast_file, episode.path)
         self.assertEqual(index, episode.index)
         self.assertEqual(test_utils.TEST_FILE_LENGTH_IN_SECONDS, episode.duration)
 
         saved_data = io.StringIO()
-        episode.Save(saved_data)
+        episode.save(saved_data)
 
         want = "%s\n%d\n%d\n%d\n" % (
             podcast_file,
@@ -42,58 +42,58 @@ class TestPodcastEpisode(unittest.TestCase):
         )
         self.assertEqual(want, saved_data.getvalue())
 
-    def testPodcastEpisodeLoadAndSave(self) -> None:
+    def test_podcast_episode_load_and_save(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\n100\n")
-        episode = podcast_episode.PodcastEpisode.Load(data)
+        episode = podcast_episode.PodcastEpisode.load(data)
 
         saved_data = io.StringIO()
-        episode.Save(saved_data)
+        episode.save(saved_data)
         self.assertEqual(data.getvalue(), saved_data.getvalue())
 
     def testPodcastEpisodeLoadBadData_OnlyPath(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
     def testPodcastEpisodeLoadBadData_MissingDurationAndModification(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
     def testPodcastEpisodeLoadBadData_MissingModification(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
     def testPodcastEpisodeLoadBadData_IndexNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\nbad index\n15\n100\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
     def testPodcastEpisodeLoadBadData_DurationNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\nbad duration\n100\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
     def testPodcastEpisodeLoadBadData_ModificationNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\nbad modification\n")
         with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
-            podcast_episode.PodcastEpisode.Load(data)
+            podcast_episode.PodcastEpisode.load(data)
 
-    def testIsPodcastFile(self) -> None:
+    def test_is_podcast_file(self) -> None:
         podcast_folder = tempfile.mkdtemp()
 
         good_files = ["test.mp3", "test.m4a"]
         for x in good_files:
             p = pathlib.Path(podcast_folder, x)
             touch(p)
-            self.assertTrue(podcast_episode.IsPodcastFile(p))
+            self.assertTrue(podcast_episode.is_podcast_file(p))
 
         bad_files = ["test.db", "test.jpg", "test.jpeg", "test.partial", "test.png"]
         for x in bad_files:
             p = pathlib.Path(podcast_folder, x)
             touch(p)
-            self.assertFalse(podcast_episode.IsPodcastFile(p))
+            self.assertFalse(podcast_episode.is_podcast_file(p))
 
 
 if __name__ == "__main__":

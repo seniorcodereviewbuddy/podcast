@@ -27,7 +27,7 @@ class TestBackup(unittest.TestCase):
     def tearDown(self) -> None:
         self.root.cleanup()
 
-    def _FilesInBackupFolder(self) -> set[str]:
+    def _FilesInbackup_folder(self) -> set[str]:
         return set(os.listdir(self.backup_folder))
 
     def _LoadFolderWithTestFiles(self, folder: pathlib.Path) -> set[str]:
@@ -46,12 +46,12 @@ class TestBackup(unittest.TestCase):
         return files
 
     def testMoveFilesToBackup_NoFiles(self) -> None:
-        self.assertCountEqual([], self._FilesInBackupFolder())
+        self.assertCountEqual([], self._FilesInbackup_folder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
         local_backup.move_files_to_backup(set())
 
-        self.assertCountEqual([], self._FilesInBackupFolder())
+        self.assertCountEqual([], self._FilesInbackup_folder())
 
     def testMoveFilesToBackup_WithFiles(self) -> None:
         self.prebackup_folder = pathlib.Path(self.root.name, "prebackup")
@@ -63,13 +63,13 @@ class TestBackup(unittest.TestCase):
         def files_in_prebackup_folder() -> set[str]:
             return set(os.listdir(self.prebackup_folder))
 
-        self.assertCountEqual([], self._FilesInBackupFolder())
+        self.assertCountEqual([], self._FilesInbackup_folder())
         self.assertCountEqual(files, files_in_prebackup_folder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
         local_backup.move_files_to_backup(files_full_path)
 
-        self.assertCountEqual(files, self._FilesInBackupFolder())
+        self.assertCountEqual(files, self._FilesInbackup_folder())
         self.assertCountEqual([], files_in_prebackup_folder())
 
     def testRemoveUnneededBackupFiles_Empty(self) -> None:
@@ -84,7 +84,7 @@ class TestBackup(unittest.TestCase):
 
         local_backup.remove_unneeded_backup_files(files, user_prompt=AlwaysSayYes)
 
-        self.assertCountEqual(files, self._FilesInBackupFolder())
+        self.assertCountEqual(files, self._FilesInbackup_folder())
 
     def testRemoveUnneededBackupFiles_AllFilesRemoved(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
@@ -93,7 +93,7 @@ class TestBackup(unittest.TestCase):
 
         local_backup.remove_unneeded_backup_files(set(), user_prompt=AlwaysSayYes)
 
-        self.assertCountEqual([], self._FilesInBackupFolder())
+        self.assertCountEqual([], self._FilesInbackup_folder())
 
     def testRemoveUnneededBackupFiles_SomeFilesRemoved(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
@@ -104,7 +104,7 @@ class TestBackup(unittest.TestCase):
 
         local_backup.remove_unneeded_backup_files(final_files, user_prompt=AlwaysSayYes)
 
-        self.assertCountEqual(final_files, self._FilesInBackupFolder())
+        self.assertCountEqual(final_files, self._FilesInbackup_folder())
 
 
 if __name__ == "__main__":

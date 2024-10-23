@@ -20,7 +20,7 @@ class TestSettings(unittest.TestCase):
             "USER_DATA_FOLDER": "E:\\podcast",
         }
 
-    def testLoadValidSettingFiles(self) -> None:
+    def test_load_valid_setting_files(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
             f.write(json.dumps(self._default_settings))
             f.close()
@@ -45,7 +45,7 @@ class TestSettings(unittest.TestCase):
             self.assertEqual(1, user_settings.NumOldestEpisodesToAdd)
             self.assertEqual(10, user_settings.TimeOfPodcastsToAddInHours)
 
-    def testSettingsFileMissingKey(self) -> None:
+    def test_settings_file_missing_key(self) -> None:
         for key in self._default_settings.keys():
             with self.subTest(key=key):
                 with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
@@ -59,7 +59,7 @@ class TestSettings(unittest.TestCase):
                     ):
                         settings.DefaultSettings(pathlib.Path(f.name))
 
-    def testSettingsFileInvalidTypesForExpectedIntegers(self) -> None:
+    def test_settings_file_invalid_types_for_expected_integers(self) -> None:
         for key in settings.Settings._EXPECTED_INT:
             with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
                 invalid_settings = self._default_settings.copy()
@@ -73,7 +73,7 @@ class TestSettings(unittest.TestCase):
                 ):
                     settings.DefaultSettings(pathlib.Path(f.name))
 
-    def testSettingsInvalidJson(self) -> None:
+    def test_settings_invalid_json(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
             f.write("")
             f.close()

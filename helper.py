@@ -7,7 +7,7 @@ import audio_metadata
 import conversions
 
 
-def PrepareAudioAndMove(
+def prepare_audio_and_move(
     file: pathlib.Path, dest: pathlib.Path, title: str, album: str, speed: float
 ) -> None:
     print("Preparing Audio file %s" % file)
