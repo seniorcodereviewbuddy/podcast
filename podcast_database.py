@@ -9,15 +9,15 @@ import time_helper
 import user_input
 
 
-class DatabaseLoadingException(Exception):
+class DatabaseLoadingError(Exception):
     pass
 
 
-class InvalidPodcastShowPath(Exception):
+class PodcastShowPathError(Exception):
     pass
 
 
-class InvalidPodcastEpisodePath(Exception):
+class PodcastEpisodePathError(Exception):
     pass
 
 
@@ -87,7 +87,7 @@ class PodcastDatabase(object):
                             podcast_folder, podcast_show.PRIORITY_SKIP
                         ).Load(f)
                     else:
-                        raise DatabaseLoadingException(
+                        raise DatabaseLoadingError(
                             "Failed to load %s." % (podcast_folder)
                         )
         return loaded
@@ -279,7 +279,7 @@ class PodcastDatabase(object):
         for show_name, episode_paths in specified_files.items():
             show = show_map.get(show_name.name)
             if not show:
-                raise InvalidPodcastShowPath(
+                raise PodcastShowPathError(
                     "Given show path, %s, doesn't exist" % show_name.name
                 )
 
@@ -289,7 +289,7 @@ class PodcastDatabase(object):
                 )
                 matching_episode = show.GetEpisode(full_potential_path)
                 if not matching_episode:
-                    raise InvalidPodcastEpisodePath(
+                    raise PodcastEpisodePathError(
                         "File, %s, doesn't exists for show %s"
                         % (episode_path, show_name.name)
                     )

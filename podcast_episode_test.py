@@ -52,32 +52,32 @@ class TestPodcastEpisode(unittest.TestCase):
 
     def testPodcastEpisodeLoadBadData_OnlyPath(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testPodcastEpisodeLoadBadData_MissingDurationAndModification(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testPodcastEpisodeLoadBadData_MissingModification(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\n")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testPodcastEpisodeLoadBadData_IndexNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\nbad index\n15\n100\n")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testPodcastEpisodeLoadBadData_DurationNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\nbad duration\n100\n")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testPodcastEpisodeLoadBadData_ModificationNotInt(self) -> None:
         data = io.StringIO("c:\\podcast\\podcast.mp3\n66\n15\nbad modification\n")
-        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingException):
+        with self.assertRaises(podcast_episode.PodcastEpisodeLoadingError):
             podcast_episode.PodcastEpisode.Load(data)
 
     def testIsPodcastFile(self) -> None:

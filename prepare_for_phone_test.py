@@ -545,7 +545,7 @@ class TestPrepareForPhone(unittest.TestCase):
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
         database.UpdatePodcasts(allow_prompt=False)
 
-        with self.assertRaises(podcast_database.InvalidPodcastEpisodePath):
+        with self.assertRaises(podcast_database.PodcastEpisodePathError):
             prepare_for_phone.GetBatchofPodcastFiles(
                 database,
                 datetime.timedelta(

@@ -7,7 +7,7 @@ import pyglet
 import time_helper
 
 
-class PodcastEpisodeLoadingException(Exception):
+class PodcastEpisodeLoadingError(Exception):
     pass
 
 
@@ -64,21 +64,21 @@ class PodcastEpisode(object):
         try:
             index = int(f.readline().strip())
         except ValueError as e:
-            raise PodcastEpisodeLoadingException(
+            raise PodcastEpisodeLoadingError(
                 "Failed to load index for episode, %s" % (e)
             )
 
         try:
             duration = int(f.readline())
         except ValueError as e:
-            raise PodcastEpisodeLoadingException(
+            raise PodcastEpisodeLoadingError(
                 "Failed to load duration for episode, %s" % (e)
             )
 
         try:
             modification_time = int(f.readline())
         except ValueError as e:
-            raise PodcastEpisodeLoadingException(
+            raise PodcastEpisodeLoadingError(
                 "Failed to load modification_time for episode, %s" % (e)
             )
 
