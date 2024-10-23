@@ -27,7 +27,7 @@ class TestBackup(unittest.TestCase):
     def tearDown(self) -> None:
         self.root.cleanup()
 
-    def _files_inbackup_folder(self) -> set[str]:
+    def _files_in_backup_folder(self) -> set[str]:
         return set(os.listdir(self.backup_folder))
 
     def _load_folder_with_test_files(self, folder: pathlib.Path) -> set[str]:
@@ -46,12 +46,12 @@ class TestBackup(unittest.TestCase):
         return files
 
     def test_move_files_to_backup_no_files(self) -> None:
-        self.assertCountEqual([], self._files_inbackup_folder())
+        self.assertCountEqual([], self._files_in_backup_folder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
         local_backup.move_files_to_backup(set())
 
-        self.assertCountEqual([], self._files_inbackup_folder())
+        self.assertCountEqual([], self._files_in_backup_folder())
 
     def test_move_files_to_backup_with_files(self) -> None:
         self.prebackup_folder = pathlib.Path(self.root.name, "prebackup")
@@ -63,13 +63,13 @@ class TestBackup(unittest.TestCase):
         def files_in_prebackup_folder() -> set[str]:
             return set(os.listdir(self.prebackup_folder))
 
-        self.assertCountEqual([], self._files_inbackup_folder())
+        self.assertCountEqual([], self._files_in_backup_folder())
         self.assertCountEqual(files, files_in_prebackup_folder())
 
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
         local_backup.move_files_to_backup(files_full_path)
 
-        self.assertCountEqual(files, self._files_inbackup_folder())
+        self.assertCountEqual(files, self._files_in_backup_folder())
         self.assertCountEqual([], files_in_prebackup_folder())
 
     def test_remove_unneeded_backup_files_empty(self) -> None:
@@ -84,7 +84,7 @@ class TestBackup(unittest.TestCase):
 
         local_backup.remove_unneeded_backup_files(files, user_prompt=always_say_yes)
 
-        self.assertCountEqual(files, self._files_inbackup_folder())
+        self.assertCountEqual(files, self._files_in_backup_folder())
 
     def test_remove_unneeded_backup_files_all_files_removed(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
@@ -93,7 +93,7 @@ class TestBackup(unittest.TestCase):
 
         local_backup.remove_unneeded_backup_files(set(), user_prompt=always_say_yes)
 
-        self.assertCountEqual([], self._files_inbackup_folder())
+        self.assertCountEqual([], self._files_in_backup_folder())
 
     def test_remove_unneeded_backup_files_some_files_removed(self) -> None:
         local_backup = backup.Local(self.backup_folder, self.backup_history_path)
@@ -106,7 +106,7 @@ class TestBackup(unittest.TestCase):
             final_files, user_prompt=always_say_yes
         )
 
-        self.assertCountEqual(final_files, self._files_inbackup_folder())
+        self.assertCountEqual(final_files, self._files_in_backup_folder())
 
 
 if __name__ == "__main__":

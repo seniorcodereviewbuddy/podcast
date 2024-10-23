@@ -201,7 +201,7 @@ class TestAndroidPhone(unittest.TestCase):
         self.assertFalse(self.phone.connected_to_phone(retry=False))
 
     @mock.patch("subprocess.run")
-    def test_connected_to_phone_a_d_b_error(self, mock_run: mock.Mock) -> None:
+    def test_connected_to_phone_adb_error(self, mock_run: mock.Mock) -> None:
         mock_run.return_value = MockProcess("Error", returncode=1)
         self.assertFalse(self.phone.connected_to_phone(retry=False))
 

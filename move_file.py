@@ -25,7 +25,7 @@ def _archive_file(
         shutil.copyfile(file_source, archive_destination)
 
 
-def _update_fileand_move_over(
+def _update_file_and_move_over(
     file_source: pathlib.Path,
     file_destination: pathlib.Path,
     title: str,
@@ -57,7 +57,7 @@ def main(args: typing.Optional[typing.List[str]]) -> None:
         parsed_args.file_path, parsed_args.archive_destination, parsed_args.dry_run
     )
 
-    _update_fileand_move_over(
+    _update_file_and_move_over(
         parsed_args.file_path,
         parsed_args.file_destination,
         parsed_args.title,

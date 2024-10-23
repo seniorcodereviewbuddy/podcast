@@ -136,7 +136,7 @@ def process_and_move_files_over(
                 raise Exception("Failed to delete all files")
 
 
-def get_batchof_podcast_files(
+def get_batch_of_podcast_files(
     database: podcast_database.PodcastDatabase,
     duration_limit: datetime.timedelta,
     num_oldest_files_to_get: int = 0,
@@ -220,7 +220,7 @@ def main(
     time_in_hours = datetime.timedelta(
         hours=user_settings.time_of_podcasts_to_add_in_hours
     )
-    unprocessed_files = get_batchof_podcast_files(
+    unprocessed_files = get_batch_of_podcast_files(
         database,
         time_in_hours,
         user_settings.num_oldest_episodes_to_add,
