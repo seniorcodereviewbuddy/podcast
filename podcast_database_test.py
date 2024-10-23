@@ -151,7 +151,7 @@ class TestPodcastDatabase(unittest.TestCase):
 
         # Now try to load the podcast database without this podcast and don't remove it.
         database = podcast_database.PodcastDatabase(self.root, [], False)
-        with self.assertRaises(podcast_database.DatabaseLoadingException):
+        with self.assertRaises(podcast_database.DatabaseLoadingError):
             database.Load(database_file, lambda x: "don't remove")
 
         database = podcast_database.PodcastDatabase(self.root, [], False)
@@ -514,7 +514,7 @@ class TestPodcastDatabase(unittest.TestCase):
             pathlib.Path("Fake_show"): [pathlib.Path(show_1_path, show_1_episodes[0])]
         }
 
-        with self.assertRaises(podcast_database.InvalidPodcastShowPath):
+        with self.assertRaises(podcast_database.PodcastShowPathError):
             database.GetSpecifiedFiles(files_to_get)
 
     def testGetSpecifiedFilesMissingEpisodes(self) -> None:
@@ -530,7 +530,7 @@ class TestPodcastDatabase(unittest.TestCase):
 
         files_to_get = {show_1_path: [pathlib.Path("fake_path")]}
 
-        with self.assertRaises(podcast_database.InvalidPodcastEpisodePath):
+        with self.assertRaises(podcast_database.PodcastEpisodePathError):
             database.GetSpecifiedFiles(files_to_get)
 
 

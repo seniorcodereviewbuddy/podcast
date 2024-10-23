@@ -34,6 +34,13 @@ repos:
     -   id: mypy
         args: ["--strict"]
         additional_dependencies: [mutagen==1.47.0]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.9
+  hooks:
+    # Only use ruff for pydocstyle comments for now.
+    # Consider using it to replace the other tooling later.
+    - id: ruff
+      args: [--fix]
 -   repo: local
     hooks:
     # TODO: Everything should be migrated out of this legacy precommit step.
