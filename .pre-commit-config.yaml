@@ -22,8 +22,6 @@ repos:
     rev: 7.1.1
     hooks:
     -   id: flake8
-        # TODO: I think this is an old arg that can be deleted.
-        args: ["--extend-exclude=*_pb2.py"]
 -   repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
