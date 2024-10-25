@@ -3,7 +3,8 @@
 	[
 		{
 			"path": ".",
-			"file_exclude_patterns": ["*.bak"]
+			"file_exclude_patterns": ["*.bak"],
+			"folder_exclude_patterns": [".mypy_cache", ".ruff_cache", "__pycache__"]
 		}
 	]
 }
