@@ -11,14 +11,16 @@ import run_tests
 
 ROOT_FOLDER = os.path.dirname(__file__)
 
-EXPECTED_ENCODING = "utf-8"
+DESIRED_ENCODING = "utf-8"
 
 
 def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
     # Send the output through print directly here, otherwise there were odd flushing races with the other prints.
-    encoding = "utf-8"
     result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding=encoding
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        encoding=DESIRED_ENCODING,
     )
     if result.stdout:
         print(result.stdout, flush=True)
@@ -26,21 +28,21 @@ def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def main(args: typing.Optional[list[str]]) -> int:
-    if sys.stdout.encoding != EXPECTED_ENCODING:
+    if sys.stdout.encoding != DESIRED_ENCODING:
         if sys.version_info < (3, 7) or not isinstance(sys.stdout, io.TextIOWrapper):
             print(
                 "Script is run with incorrect stdout encoding and python version is too old to allow it to be automatically fixed."
             )
             print(
-                f"Please either run this script with stdout encoding as {EXPECTED_ENCODING}, or increase python version to 3.7 or later."
+                f"Please either run this script with stdout encoding as {DESIRED_ENCODING}, or increase python version to 3.7 or later."
             )
             return 1
 
         print(
-            f"WARNING! This script will output utf-8 so it expects stdout to be in {EXPECTED_ENCODING} encoding."
+            f"WARNING! This script will output {DESIRED_ENCODING} so it expects stdout to be in {DESIRED_ENCODING} encoding."
         )
-        print(f"WARNING! Reconfiguring stdout encoding to be {EXPECTED_ENCODING}")
-        sys.stdout.reconfigure(encoding=EXPECTED_ENCODING)
+        print(f"WARNING! Reconfiguring stdout encoding to be {DESIRED_ENCODING}")
+        sys.stdout.reconfigure(encoding=DESIRED_ENCODING)
 
     parser = argparse.ArgumentParser(
         description="Prepare repo for submitting a change by running cleanups and checks"
