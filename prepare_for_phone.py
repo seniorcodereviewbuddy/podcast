@@ -51,34 +51,35 @@ def _generate_title(file: pathlib.Path, title_prefix: str) -> str:
     return title_prefix + os.path.basename(file)
 
 
+def _work(q: queue.Queue[str], args: typing.List[str]) -> None:
+    script = os.path.join(ROOT_DIR, "move_file.py")
+    args = [sys.executable, script] + args
+    work_env = dict(os.environ)
+    work_env["PYTHONIOENCODING"] = "utf-8"
+
+    with subprocess.Popen(
+        args,
+        stdin=None,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        encoding="utf-8",
+        env=work_env,
+    ) as process:
+        if process.stdout is None:
+            raise Exception("stdout is missing")
+        for stdout_line in iter(process.stdout.readline, ""):
+            stdout_line = stdout_line.strip()
+            if stdout_line:
+                q.put(stdout_line)
+
+
 def process_and_move_files_over(
     files: typing.List[full_podcast_episode.FullPodcastEpisode],
     destination: pathlib.Path,
     archive_folder: pathlib.Path,
     dry_run: bool,
 ) -> None:
-    def work(q: queue.Queue[str], args: typing.List[str]) -> None:
-        script = os.path.join(ROOT_DIR, "move_file.py")
-        args = [sys.executable, script] + args
-        work_env = dict(os.environ)
-        work_env["PYTHONIOENCODING"] = "utf-8"
-
-        with subprocess.Popen(
-            args,
-            stdin=None,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            encoding="utf-8",
-            env=work_env,
-        ) as process:
-            if process.stdout is None:
-                raise Exception("stdout is missing")
-            for stdout_line in iter(process.stdout.readline, ""):
-                stdout_line = stdout_line.strip()
-                if stdout_line:
-                    q.put(stdout_line)
-
     # Limit the number of workers to less than the number of CPUs so I can still use the computer while converting.
     cpus_available = os.cpu_count() or 1
     max_workers = max(cpus_available - 2, 1)
@@ -108,7 +109,7 @@ def process_and_move_files_over(
                 args += ["--archive-destination=%s" % (archive_destination)]
             if dry_run:
                 args += ["--dry-run"]
-            futures.append((file, q, executor.submit(work, q, args)))
+            futures.append((file, q, executor.submit(_work, q, args)))
         for file, q, future in futures:
             while not future.done():
                 while True:
