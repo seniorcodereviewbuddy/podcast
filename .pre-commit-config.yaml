@@ -35,7 +35,7 @@ repos:
         args: ["--strict"]
         additional_dependencies: [mutagen==1.47.0]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.7.1
+  rev: v0.7.4
   hooks:
     # Only use ruff for pep8-naming for now.
     # Consider using it to replace the other tooling later.
