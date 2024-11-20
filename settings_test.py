@@ -1,3 +1,4 @@
+import datetime
 import json
 import pathlib
 import tempfile
@@ -43,7 +44,9 @@ class TestSettings(unittest.TestCase):
                 pathlib.Path("D:\\Podcasts\\On Phone"), user_settings.backup_folder
             )
             self.assertEqual(1, user_settings.num_oldest_episodes_to_add)
-            self.assertEqual(10, user_settings.time_of_podcasts_to_add_in_hours)
+            self.assertEqual(
+                datetime.timedelta(hours=10), user_settings.time_of_podcasts_to_add
+            )
 
     def test_settings_file_missing_key(self) -> None:
         for key in self._default_settings.keys():
