@@ -7,10 +7,12 @@ import typing
 import unittest
 
 import archive
+import backup
 import full_podcast_episode
 import podcast_database
 import podcast_show
 import prepare_for_phone
+import test_android_phone
 import test_utils
 
 
@@ -29,6 +31,10 @@ def _get_x_oldest_episodes(
     sorted(episodes, key=lambda x: x.modification_time)
 
     return episodes[0:x]
+
+
+def always_say_yes(x: str) -> bool:
+    return True
 
 
 class TestPrepareForPhone(unittest.TestCase):
@@ -660,6 +666,42 @@ fake_show: Show 1 0:15:00
 fake_show: Show 2 0:20:00
 2 files in total, duration of 0:35:00"""
         self.assertEqual(summary, expected_summary)
+
+    def test_remove_unneeded_backups_no_files_on_phone(self) -> None:
+        phone = test_android_phone.TestAndroidPhone(set())
+
+        backup_folder = self.root.joinpath("Backup")
+        backup_folder.mkdir()
+        backup_history_path = self.root.joinpath("backup_history.txt")
+
+        backup_file = backup_folder.joinpath("file.mp3")
+        backup_file.touch()
+
+        local_backup = backup.Local(backup_folder, backup_history_path)
+
+        prepare_for_phone.remove_unneeded_backups(
+            phone, local_backup, user_prompt=always_say_yes
+        )
+
+        self.assertFalse(backup_file.exists())
+
+    def test_remove_unneeded_backups_files_on_phone(self) -> None:
+        phone = test_android_phone.TestAndroidPhone(set(["file.mp3"]))
+
+        backup_folder = self.root.joinpath("Backup")
+        backup_folder.mkdir()
+        backup_history_path = self.root.joinpath("backup_history.txt")
+
+        backup_file = backup_folder.joinpath("file.mp3")
+        backup_file.touch()
+
+        local_backup = backup.Local(backup_folder, backup_history_path)
+
+        prepare_for_phone.remove_unneeded_backups(
+            phone, local_backup, user_prompt=always_say_yes
+        )
+
+        self.assertTrue(backup_file.exists())
 
 
 if __name__ == "__main__":

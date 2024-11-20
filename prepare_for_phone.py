@@ -241,6 +241,21 @@ def get_podcast_episodes_summary(
     return "\n".join(summary_lines)
 
 
+def remove_unneeded_backups(
+    phone: android_phone.AndroidPhone,
+    backup: backup.Local,
+    user_prompt: user_input.PromptYesOrNo_Alias = user_input.prompt_yes_or_no,
+) -> None:
+    try:
+        files_on_phone = phone.get_podcast_episodes_on_phone()
+    except android_phone.AndroidConnectionError as e:
+        print(e)
+        print("Failed to see android phone, not removing old backups this time")
+        return
+
+    backup.remove_unneeded_backup_files(files_on_phone, user_prompt=user_prompt)
+
+
 # TODO: Test this function someday
 def main(
     args: typing.Optional[typing.List[str]], user_settings: settings.Settings
@@ -331,13 +346,7 @@ def main(
             )
         local_backup.move_files_to_backup(copy_results.copied)
 
-        try:
-            files_on_phone = phone.get_podcast_episodes_on_phone()
-        except android_phone.AndroidConnectionError as e:
-            print(e)
-            print("Failed to see android phone, skipping folder back sync")
-        else:
-            local_backup.remove_unneeded_backup_files(files_on_phone)
+        remove_unneeded_backups(phone, local_backup)
 
 
 if __name__ == "__main__":

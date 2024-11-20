@@ -22,6 +22,11 @@ def is_phone_connected(phone_name: str) -> bool:
     )
 
 
+class CopyFilesToPhoneResults(typing.NamedTuple):
+    copied: set[pathlib.Path]
+    failed_to_copy: set[pathlib.Path]
+
+
 class AndroidPhone(object):
     def __init__(
         self,
@@ -46,10 +51,6 @@ class AndroidPhone(object):
             )
             if not user_wants_to_retry:
                 return False
-
-    class CopyFilesToPhoneResults(typing.NamedTuple):
-        copied: set[pathlib.Path]
-        failed_to_copy: set[pathlib.Path]
 
     def copy_files_to_phone(
         self, files: typing.List[pathlib.Path]
@@ -98,7 +99,7 @@ class AndroidPhone(object):
                 f"Failed to copy {len(failed_to_copy)} files to phone.\n{separated_files}"
             )
 
-        return AndroidPhone.CopyFilesToPhoneResults(copied, failed_to_copy)
+        return CopyFilesToPhoneResults(copied, failed_to_copy)
 
     def get_podcast_episodes_on_phone(self) -> set[str]:
         process = subprocess.run(
