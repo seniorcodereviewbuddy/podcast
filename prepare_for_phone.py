@@ -213,7 +213,9 @@ def main(
         user_settings.podcast_directory_on_phone,
         user_settings.android_history,
     )
-    phone.connected_to_phone()
+    # We want to try connecting to the phone before continuing as we don't want
+    # to start processing the files and only later realize the phone isn't connected.
+    phone.connect_to_phone()
 
     time_in_hours = datetime.timedelta(
         hours=user_settings.time_of_podcasts_to_add_in_hours
@@ -258,7 +260,7 @@ def main(
         parsed_args.dry_run,
     )
 
-    if phone.connected_to_phone():
+    if phone.connect_to_phone():
         processed_files = [
             pathlib.Path(
                 user_settings.processed_file_boarding_zone_folder,

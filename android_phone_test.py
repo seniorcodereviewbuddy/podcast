@@ -50,23 +50,35 @@ class TestAndroidPhone(unittest.TestCase):
         self.root.cleanup()
 
     @mock.patch("subprocess.run")
+    def test_connect_to_phone_adb_error(self, mock_run: mock.Mock) -> None:
+        mock_run.return_value = MockProcess("Error\n", returncode=1)
+        self.assertFalse(self.phone.connect_to_phone(retry=False))
+
+    @mock.patch("subprocess.run")
     def test_is_connected_no_devices(self, mock_run: mock.Mock) -> None:
-        mock_run.return_value = MockProcess("List of devices attached", 0)
-        self.assertFalse(self.phone.connected_to_phone(retry=False))
+        mock_run.return_value = MockProcess("List of devices attached\n", 0)
+        self.assertFalse(self.phone.connect_to_phone(retry=False))
+
+    @mock.patch("subprocess.run")
+    def test_connect_to_phone_phone_not_present(self, mock_run: mock.Mock) -> None:
+        mock_run.return_value = MockProcess(
+            "List of devices attached\nmade_up_phone_id  device"
+        )
+        self.assertFalse(self.phone.connect_to_phone(retry=False))
 
     @mock.patch("subprocess.run")
     def test_is_connected_connected_not_authorized(self, mock_run: mock.Mock) -> None:
         mock_run.return_value = MockProcess(
-            "List of devices attached\nfake_id  unauthorized", 0
+            f"List of devices attached\n{self.phone_name}  unauthorized", 0
         )
-        self.assertFalse(self.phone.connected_to_phone(retry=False))
+        self.assertFalse(self.phone.connect_to_phone(retry=False))
 
     @mock.patch("subprocess.run")
     def test_is_connected_connected_authorized(self, mock_run: mock.Mock) -> None:
         mock_run.return_value = MockProcess(
-            "List of devices attached\nfake_id  device", 0
+            f"List of devices attached\n{self.phone_name}  device", 0
         )
-        self.assertTrue(self.phone.connected_to_phone(retry=False))
+        self.assertTrue(self.phone.connect_to_phone(retry=False))
 
     @mock.patch("subprocess.run")
     def test_copy_files_to_phone(self, mock_run: mock.Mock) -> None:
@@ -187,23 +199,6 @@ class TestAndroidPhone(unittest.TestCase):
         files_found_on_phone = self.phone.get_podcast_episodes_on_phone()
 
         self.assertSetEqual(files_found_on_phone, set(all_files))
-
-    @mock.patch("subprocess.run")
-    def test_connected_to_phone_phone_present(self, mock_run: mock.Mock) -> None:
-        mock_run.return_value = MockProcess(
-            "List of devices attached\n%s device" % (self.phone_name,)
-        )
-        self.assertTrue(self.phone.connected_to_phone())
-
-    @mock.patch("subprocess.run")
-    def test_connected_to_phone_phone_not_present(self, mock_run: mock.Mock) -> None:
-        mock_run.return_value = MockProcess("List of devices attached\n")
-        self.assertFalse(self.phone.connected_to_phone(retry=False))
-
-    @mock.patch("subprocess.run")
-    def test_connected_to_phone_adb_error(self, mock_run: mock.Mock) -> None:
-        mock_run.return_value = MockProcess("Error", returncode=1)
-        self.assertFalse(self.phone.connected_to_phone(retry=False))
 
 
 if __name__ == "__main__":
