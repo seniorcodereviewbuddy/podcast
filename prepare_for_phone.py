@@ -292,7 +292,7 @@ def main(
         print("Done.")
         return
 
-    process_and_move_files_over(
+    moved_files = process_and_move_files_over(
         unprocessed_files,
         user_settings.processed_file_boarding_zone_folder,
         user_settings.archive_folder,
@@ -309,14 +309,7 @@ def main(
         return
 
     if phone.connect_to_phone():
-        processed_files = [
-            pathlib.Path(
-                user_settings.processed_file_boarding_zone_folder,
-                podcast.path.name,
-            )
-            for podcast in unprocessed_files
-        ]
-        copy_results = phone.copy_files_to_phone(processed_files)
+        copy_results = phone.copy_files_to_phone(moved_files)
 
         local_backup = backup.Local(
             user_settings.backup_folder, user_settings.backup_history
