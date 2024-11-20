@@ -297,6 +297,15 @@ def main(
         parsed_args.dry_run,
     )
 
+    # Currently dry_run isn't support past this point, so we stop early.
+    # https://github.com/seniorcodereviewbuddy/podcast/issues/55 looks
+    # at fixing this.
+    if parsed_args.dry_run:
+        print(
+            "Stopping now dry runs don't support interacting with android or the local backup"
+        )
+        return
+
     if phone.connect_to_phone():
         processed_files = [
             pathlib.Path(
