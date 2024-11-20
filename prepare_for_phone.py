@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import concurrent.futures
+import dataclasses
 import datetime
 import os
 import pathlib
@@ -93,12 +94,19 @@ def _work(q: queue.Queue[str], args: typing.List[str]) -> None:
                 q.put(stdout_line)
 
 
+@dataclasses.dataclass
+class ProcessWorkUnit:
+    file_destination: pathlib.Path
+    shared_queue: queue.Queue[str]
+    future: concurrent.futures.Future[None]
+
+
 def process_and_move_files_over(
     files: typing.List[full_podcast_episode.FullPodcastEpisode],
     destination: pathlib.Path,
     archive_folder: pathlib.Path,
     dry_run: bool,
-) -> None:
+) -> typing.List[pathlib.Path]:
     if not destination.is_dir():
         raise InvalidDestinationError(
             f'Invalid destination folder passed into process_and_move_files_over. Expected a folder but "{destination}" isn\'t.'
@@ -114,10 +122,8 @@ def process_and_move_files_over(
     max_workers = max(cpus_available - 2, 1)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = []
+        work_units = []
         for file in files:
-            q: queue.Queue[str] = queue.Queue()
-
             title_prefix = "%04d_" % (file.index) if file.index else ""
             title = _generate_title(file.path, title_prefix)
 
@@ -138,32 +144,42 @@ def process_and_move_files_over(
                 args += ["--archive-destination=%s" % (archive_destination)]
             if dry_run:
                 args += ["--dry-run"]
-            futures.append((file, q, executor.submit(_work, q, args)))
-        for file, q, future in futures:
-            while not future.done():
+
+            q: queue.Queue[str] = queue.Queue()
+            work_unit = ProcessWorkUnit(
+                file_destination, q, executor.submit(_work, q, args)
+            )
+            work_units.append(work_unit)
+
+        for work_unit in work_units:
+            while not work_unit.future.done():
                 while True:
                     try:
-                        output = q.get_nowait()
+                        output = work_unit.shared_queue.get_nowait()
                         print(output)
                     except queue.Empty:
                         break
-            if future.exception():
-                print("Hit an exception:\n\t%s" % (future.exception()))
+            if work_unit.future.exception():
+                print("Hit an exception:\n\t%s" % (work_unit.future.exception()))
             else:
-                while not q.empty():
-                    print(q.get())
+                while not work_unit.shared_queue.empty():
+                    print(work_unit.shared_queue.get())
 
-        # Check to verify the file has been deleted if this wasn't a dry run.
-        if not dry_run:
-            all_files_delete = True
-            for file in files:
-                if file.path.exists():
-                    all_files_delete = False
-                    print(
-                        "%s wasn't deleted, check if it was converted." % (file.path,)
-                    )
-            if not all_files_delete:
-                raise Exception("Failed to delete all files")
+        # If this is a dry run, we can stop now and just return an empty list as no files were moved.
+        if dry_run:
+            return []
+
+        # Since this wasn't a dry run, ensure the original files were deleted and return the moved paths.
+        all_files_delete = True
+        for file in files:
+            if file.path.exists():
+                all_files_delete = False
+                print("%s wasn't deleted, check if it was converted." % (file.path,))
+
+        if not all_files_delete:
+            raise Exception("Failed to delete all files")
+
+        return [work_unit.file_destination for work_unit in work_units]
 
 
 def get_batch_of_podcast_files(
