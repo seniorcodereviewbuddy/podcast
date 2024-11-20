@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import argparse
 import concurrent.futures
 import datetime
 import os
@@ -14,6 +13,7 @@ import android_phone
 import archive
 import audio_metadata
 import backup
+import command_args
 import full_podcast_episode
 import podcast_database
 import podcast_show
@@ -178,10 +178,7 @@ def get_batch_of_podcast_files(
 def main(
     args: typing.Optional[typing.List[str]], user_settings: settings.Settings
 ) -> None:
-    parser = argparse.ArgumentParser(description="Prepare podcast episodes for phone")
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--verbose", action="store_true")
-    parsed_args = parser.parse_args(args)
+    parsed_args = command_args.parse_args(args)
 
     unknown_folders = find_unknown_folders(
         user_settings.podcast_folder, user_settings.podcasts
