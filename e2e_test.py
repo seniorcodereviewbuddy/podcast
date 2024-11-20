@@ -158,6 +158,56 @@ class TestE2E(unittest.TestCase):
         prepare_for_phone.main(args, test_settings)
 
     @mock.patch("builtins.input")
+    def test_full_end_to_end_test_with_show_copy_to_phone_one_file_dry_run(
+        self, user_input: mock.Mock
+    ) -> None:
+        user_input.side_effect = [
+            # Initial for show 1.
+            "Y",
+            # Copy Files?
+            "Y",
+        ]
+
+        args: list[str] = ["--dry_run"]
+
+        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
+        podcast_folder.mkdir()
+
+        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_shows = [
+            podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
+        ]
+
+        episodes = self._populate_podcast_show(podcast_show_folder)
+
+        test_settings = self.create_test_settings(
+            TestE2E.phone_emulator.id,
+            TestE2E.phone_emulator.create_new_podcast_folder(),
+            podcast_folder,
+            podcast_shows,
+            hours_to_add=0,
+        )
+
+        prepare_for_phone.main(args, test_settings)
+
+        # Since this was a dry run:
+        # 1) Nothing should have been added to the phone or backup folder.
+        # 2) All episodes should still be in the initial folder.
+        phone = android_phone.AndroidPhone(
+            TestE2E.phone_emulator.id,
+            test_settings.podcast_directory_on_phone,
+            test_settings.android_history,
+        )
+        self.assertEqual(set(), phone.get_podcast_episodes_on_phone())
+
+        files_in_backup_folder = set(os.listdir(test_settings.backup_folder))
+        self.assertEqual(set(), files_in_backup_folder)
+
+        self.maxDiff = None
+        files_in_episode_folder = set(podcast_show_folder.iterdir())
+        self.assertCountEqual(episodes, files_in_episode_folder)
+
+    @mock.patch("builtins.input")
     def test_full_end_to_end_test_with_show_copy_to_phone_one_file(
         self, user_input: mock.Mock
     ) -> None:
