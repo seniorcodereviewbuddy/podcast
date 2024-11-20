@@ -101,27 +101,26 @@ class TestPrepareForPhone(unittest.TestCase):
             [unknown_folder],
         )
 
-    def test_unknown_podcast_folders_found_known_folder_present(self) -> None:
+    def test_validate_podcast_folders_known_folder_present(self) -> None:
         known_folder = pathlib.Path("known_folder")
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
         ]
 
-        self.assertFalse(
-            prepare_for_phone.unknown_podcast_folders_found(
-                self.root, podcast_shows=podcast_shows
-            )
+        # Verify this doesn't raise an exception when called with only
+        # known folders.
+        prepare_for_phone.validate_podcast_folders(
+            self.root, podcast_shows=podcast_shows
         )
 
-    def test_unknown_podcast_folders_found_unknown_folder_present(self) -> None:
+    def test_validate_podcast_folders_unknown_folder_present(self) -> None:
         unknown_folder = pathlib.Path("unknown_folder")
         os.mkdir(pathlib.Path(self.root, unknown_folder))
 
-        self.assertTrue(
-            prepare_for_phone.unknown_podcast_folders_found(self.root, podcast_shows=[])
-        )
+        with self.assertRaises(prepare_for_phone.UnknownPodcastFoldersError):
+            prepare_for_phone.validate_podcast_folders(self.root, podcast_shows=[])
 
-    def test_unknown_podcast_folders_found_known_and_unknowns_folders_present(
+    def test_validate_podcast_folders_known_and_unknowns_folders_present(
         self,
     ) -> None:
         known_folder = pathlib.Path("known_folder")
@@ -132,11 +131,10 @@ class TestPrepareForPhone(unittest.TestCase):
         unknown_folder = pathlib.Path("unknown_folder")
         os.mkdir(pathlib.Path(self.root, unknown_folder))
 
-        self.assertTrue(
-            prepare_for_phone.unknown_podcast_folders_found(
+        with self.assertRaises(prepare_for_phone.UnknownPodcastFoldersError):
+            prepare_for_phone.validate_podcast_folders(
                 self.root, podcast_shows=podcast_shows
             )
-        )
 
     def test_process_and_move_files_over(self) -> None:
         podcast_folder = pathlib.Path("podcast_show")

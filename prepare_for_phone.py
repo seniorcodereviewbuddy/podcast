@@ -23,6 +23,10 @@ import user_input
 ROOT_DIR = os.path.dirname(__file__)
 
 
+class UnknownPodcastFoldersError(Exception):
+    pass
+
+
 def find_unknown_folders(
     podcast_folder: pathlib.Path, expected_folders: typing.List[str]
 ) -> typing.List[pathlib.Path]:
@@ -37,20 +41,17 @@ def find_unknown_folders(
     return unknown_folders
 
 
-def unknown_podcast_folders_found(
+def validate_podcast_folders(
     podcast_folder: pathlib.Path, podcast_shows: typing.List[podcast_show.PodcastShow]
-) -> bool:
+) -> None:
     expected_folders = [x.podcast_folder.name for x in podcast_shows]
     unknown_folders = find_unknown_folders(podcast_folder, expected_folders)
 
-    if not unknown_folders:
-        return False
-
-    print(
-        f"\n%{len(unknown_folders)}d unknown folders, please update user settings to know what to do.\n"
-        "Unknown folders:\n" + "\n".join([str(x) for x in unknown_folders])
-    )
-    return True
+    if unknown_folders:
+        raise UnknownPodcastFoldersError(
+            f"\n{len(unknown_folders)} unknown folders, please update user settings to know what to do.\n"
+            "Unknown folders:\n" + "\n".join([str(x) for x in unknown_folders])
+        )
 
 
 def _generate_title(file: pathlib.Path, title_prefix: str) -> str:
@@ -190,11 +191,7 @@ def main(
 ) -> None:
     parsed_args = command_args.parse_args(args)
 
-    # If there are unknown folders, the user settings must be updated.
-    if unknown_podcast_folders_found(
-        user_settings.podcast_folder, user_settings.podcasts
-    ):
-        return
+    validate_podcast_folders(user_settings.podcast_folder, user_settings.podcasts)
 
     database = podcast_database.PodcastDatabase(
         user_settings.podcast_folder,
