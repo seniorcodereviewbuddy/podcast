@@ -62,6 +62,7 @@ class Settings(object):
         # If any of the required folders are missing, create them.
         self._ARCHIVE_FOLDER.mkdir(exist_ok=True)
         self._BACKUP_FOLDER.mkdir(exist_ok=True)
+        self._PROCESSED_FILE_BOARDING_ZONE_FOLDER.mkdir(exist_ok=True)
         self._USER_DATA_FOLDER.mkdir(exist_ok=True)
 
         self._PODCAST_DIRECTORY_ON_PHONE = pathlib.Path(

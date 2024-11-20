@@ -8,17 +8,31 @@ import settings
 
 class TestSettings(unittest.TestCase):
     def setUp(self) -> None:
+        self._root_directory = tempfile.TemporaryDirectory()
+        self.root = pathlib.Path(self._root_directory.name)
+
+        self.podcast_folder = self.root.joinpath("Podcasts")
+        self.processed_file_boarding_zone_folder = self.root.joinpath("Add to Phone")
+        self.archive_folder = self.root.joinpath("Archive")
+        self.backup_folder = self.root.joinpath("Backup Folder")
+        self.user_data_folder = self.root.joinpath("User Data Folder")
+
         self._default_settings = {
             "ANDROID_PHONE_ID": "ABCD",
             "PODCAST_DIRECTORY_ON_PHONE": "/storage/emulated/0/Podcasts",
-            "PODCAST_FOLDER": "D:\\Podcasts",
-            "PROCESSED_FILE_BOARDING_ZONE_FOLDER": "D:\\Podcasts\\Add to Phone",
-            "ARCHIVE_FOLDER": "D:\\Podcasts\\Archive",
-            "BACKUP_FOLDER": "D:\\Podcasts\\On Phone",
+            "PODCAST_FOLDER": str(self.podcast_folder),
+            "PROCESSED_FILE_BOARDING_ZONE_FOLDER": str(
+                self.processed_file_boarding_zone_folder
+            ),
+            "ARCHIVE_FOLDER": str(self.archive_folder),
+            "BACKUP_FOLDER": str(self.backup_folder),
             "NUM_OLDEST_EPISODES_TO_ADD": 1,
             "TIME_OF_PODCASTS_TO_ADD_IN_HOURS": 10,
-            "USER_DATA_FOLDER": "E:\\podcast",
+            "USER_DATA_FOLDER": str(self.user_data_folder),
         }
+
+    def tearDown(self) -> None:
+        self._root_directory.cleanup()
 
     def test_load_valid_setting_files(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as f:
@@ -31,17 +45,13 @@ class TestSettings(unittest.TestCase):
                 pathlib.Path("/storage/emulated/0/Podcasts"),
                 user_settings.podcast_directory_on_phone,
             )
-            self.assertEqual(pathlib.Path("D:\\Podcasts"), user_settings.podcast_folder)
+            self.assertEqual(self.podcast_folder, user_settings.podcast_folder)
             self.assertEqual(
-                pathlib.Path("D:\\Podcasts\\Add to Phone"),
+                self.processed_file_boarding_zone_folder,
                 user_settings.processed_file_boarding_zone_folder,
             )
-            self.assertEqual(
-                pathlib.Path("D:\\Podcasts\\Archive"), user_settings.archive_folder
-            )
-            self.assertEqual(
-                pathlib.Path("D:\\Podcasts\\On Phone"), user_settings.backup_folder
-            )
+            self.assertEqual(self.archive_folder, user_settings.archive_folder)
+            self.assertEqual(self.backup_folder, user_settings.backup_folder)
             self.assertEqual(1, user_settings.num_oldest_episodes_to_add)
             self.assertEqual(10, user_settings.time_of_podcasts_to_add_in_hours)
 
