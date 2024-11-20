@@ -37,7 +37,8 @@ class TestE2E(unittest.TestCase):
         self.root.cleanup()
 
     def required_shows(self) -> list[podcast_show.PodcastShow]:
-        # TODO: Maybe these shouldn't be living in the same folder? Or they should be
+        # TODO(https://github.com/seniorcodereviewbuddy/podcast/issues/44)
+        # Maybe these shouldn't be living in the same folder? Or they should be
         # handled in a better way.
         return [
             podcast_show.PodcastShow(
