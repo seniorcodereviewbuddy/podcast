@@ -237,12 +237,9 @@ def main(
     # to start processing the files and only later realize the phone isn't connected.
     phone.connect_to_phone()
 
-    time_in_hours = datetime.timedelta(
-        hours=user_settings.time_of_podcasts_to_add_in_hours
-    )
     unprocessed_files = get_batch_of_podcast_files(
         database,
-        time_in_hours,
+        user_settings.time_of_podcasts_to_add,
         user_settings.num_oldest_episodes_to_add,
         user_settings.specified_files,
     )
