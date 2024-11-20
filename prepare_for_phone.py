@@ -185,6 +185,26 @@ def get_batch_of_podcast_files(
     return files
 
 
+def get_podcast_episodes_summary(
+    podcast_episodes: typing.List[full_podcast_episode.FullPodcastEpisode],
+) -> str:
+    if not podcast_episodes:
+        return "No Potential Files"
+
+    total_duration = sum((x.duration for x in podcast_episodes), datetime.timedelta())
+
+    summary_lines = ["Potential Files:"]
+
+    summary_lines += [
+        f"{x.podcast_show_name}: {x.path.name} {x.duration}" for x in podcast_episodes
+    ]
+    summary_lines += [
+        f"{len(podcast_episodes)} files in total, duration of {total_duration}"
+    ]
+
+    return "\n".join(summary_lines)
+
+
 # TODO: Test this function someday
 def main(
     args: typing.Optional[typing.List[str]], user_settings: settings.Settings
@@ -227,19 +247,9 @@ def main(
         user_settings.specified_files,
     )
 
-    total_duration = sum((x.duration for x in unprocessed_files), datetime.timedelta())
-
-    print("Potential Files:")
-    print(
-        "\n".join(
-            "%s: %s (%s)" % (x.podcast_show_name, x.path.name, x.duration)
-            for x in unprocessed_files
-        )
-    )
-    print(
-        "\n%d files in total, duration of %s" % (len(unprocessed_files), total_duration)
-    )
-
+    # Print a summary of the collected files and see if the user wants to
+    # continue.
+    print(get_podcast_episodes_summary(unprocessed_files))
     result = user_input.prompt_yes_or_no(
         "Process files and move to '%s' before putting on phone: "
         % user_settings.processed_file_boarding_zone_folder
