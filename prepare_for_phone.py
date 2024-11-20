@@ -24,23 +24,33 @@ ROOT_DIR = os.path.dirname(__file__)
 
 
 def find_unknown_folders(
-    root: pathlib.Path, podcast_shows: typing.List[podcast_show.PodcastShow]
+    podcast_folder: pathlib.Path, expected_folders: typing.List[str]
 ) -> typing.List[pathlib.Path]:
     unknown_folders = []
-    for item in root.iterdir():
+    for item in podcast_folder.iterdir():
         if item.is_file():
             continue
 
-        found_match = False
-        for x in podcast_shows:
-            if item.name == x.podcast_folder.name:
-                found_match = True
-                break
-
-        if not found_match:
+        if item.name not in expected_folders:
             unknown_folders.append(pathlib.Path(item.name))
 
     return unknown_folders
+
+
+def unknown_podcast_folders_found(
+    podcast_folder: pathlib.Path, podcast_shows: typing.List[podcast_show.PodcastShow]
+) -> bool:
+    expected_folders = [x.podcast_folder.name for x in podcast_shows]
+    unknown_folders = find_unknown_folders(podcast_folder, expected_folders)
+
+    if not unknown_folders:
+        return False
+
+    print(
+        f"\n%{len(unknown_folders)}d unknown folders, please update user settings to know what to do.\n"
+        "Unknown folders:\n" + "\n".join([str(x) for x in unknown_folders])
+    )
+    return True
 
 
 def _generate_title(file: pathlib.Path, title_prefix: str) -> str:
@@ -180,17 +190,10 @@ def main(
 ) -> None:
     parsed_args = command_args.parse_args(args)
 
-    unknown_folders = find_unknown_folders(
+    # If there are unknown folders, the user settings must be updated.
+    if unknown_podcast_folders_found(
         user_settings.podcast_folder, user_settings.podcasts
-    )
-    if unknown_folders:
-        # TODO: Ideally this should return an error for tests.
-        print(
-            "\nUnknown folders:\n%s\n%d Unknown folders, please update code to know what to do\nPress any key to exit"
-            % ("\n".join([str(x) for x in unknown_folders]), len(unknown_folders)),
-            end="",
-        )
-        input()
+    ):
         return
 
     database = podcast_database.PodcastDatabase(
