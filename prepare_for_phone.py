@@ -27,6 +27,14 @@ class UnknownPodcastFoldersError(Exception):
     pass
 
 
+class InvalidDestinationError(Exception):
+    pass
+
+
+class InvalidArchiveFolderError(Exception):
+    pass
+
+
 def find_unknown_folders(
     podcast_folder: pathlib.Path, expected_folders: typing.List[str]
 ) -> typing.List[pathlib.Path]:
@@ -91,6 +99,16 @@ def process_and_move_files_over(
     archive_folder: pathlib.Path,
     dry_run: bool,
 ) -> None:
+    if not destination.is_dir():
+        raise InvalidDestinationError(
+            f'Invalid destination folder passed into process_and_move_files_over. Expected a folder but "{destination}" isn\'t.'
+        )
+
+    if not archive_folder.is_dir():
+        raise InvalidArchiveFolderError(
+            f'Invalid archive folder passed into process_and_move_files_over. Expected a folder but "{archive_folder}" isn\'t.'
+        )
+
     # Limit the number of workers to less than the number of CPUs so I can still use the computer while converting.
     cpus_available = os.cpu_count() or 1
     max_workers = max(cpus_available - 2, 1)
@@ -255,10 +273,6 @@ def main(
     if not result:
         print("Done.")
         return
-
-    # TODO: Raise an exception if it exists and is a file?
-    if not user_settings.processed_file_boarding_zone_folder.exists():
-        os.mkdir(user_settings.processed_file_boarding_zone_folder)
 
     process_and_move_files_over(
         unprocessed_files,

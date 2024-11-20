@@ -136,6 +136,26 @@ class TestPrepareForPhone(unittest.TestCase):
                 self.root, podcast_shows=podcast_shows
             )
 
+    def test_process_and_move_files_over_invalid_destination(self) -> None:
+        destination_folder = pathlib.Path(self.root, "destination")
+        archive_folder = pathlib.Path(self.root, "archive")
+        archive_folder.mkdir()
+
+        with self.assertRaises(prepare_for_phone.InvalidDestinationError):
+            prepare_for_phone.process_and_move_files_over(
+                [], destination_folder, archive_folder, True
+            )
+
+    def test_process_and_move_files_over_invalid_archive(self) -> None:
+        destination_folder = pathlib.Path(self.root, "destination")
+        destination_folder.mkdir()
+        archive_folder = pathlib.Path(self.root, "archive")
+
+        with self.assertRaises(prepare_for_phone.InvalidArchiveFolderError):
+            prepare_for_phone.process_and_move_files_over(
+                [], destination_folder, archive_folder, True
+            )
+
     def test_process_and_move_files_over(self) -> None:
         podcast_folder = pathlib.Path("podcast_show")
         podcast_test_show = self._create_podcast_show(
