@@ -154,9 +154,10 @@ class TestPrepareForPhone(unittest.TestCase):
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
 
-        prepare_for_phone.process_and_move_files_over(
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
+        self.assertEqual([], moved_files)
 
         self.assertCountEqual(
             _list_of_full_podcast_episodes_to_list_of_names(unprocessed_files),
@@ -166,9 +167,14 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.process_and_move_files_over(
+        expected_moved_files = [
+            copied_folder.joinpath(file.path.name) for file in unprocessed_files
+        ]
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
+        self.assertCountEqual(moved_files, expected_moved_files)
+
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
         self.assertCountEqual(
             _list_of_full_podcast_episodes_to_list_of_names(unprocessed_files),
@@ -198,9 +204,10 @@ class TestPrepareForPhone(unittest.TestCase):
         # Moved folder should be empty for dry run.
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
-        prepare_for_phone.process_and_move_files_over(
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
+        self.assertEqual([], moved_files)
         self.assertEqual(
             ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"],
             os.listdir(podcast_folder),
@@ -213,9 +220,13 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.process_and_move_files_over(
+        expected_moved_files = [
+            copied_folder.joinpath(file.path.name) for file in unprocessed_files
+        ]
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
+        self.assertCountEqual(moved_files, expected_moved_files)
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
         self.assertCountEqual(
             _list_of_full_podcast_episodes_to_list_of_names(unprocessed_files),
@@ -261,9 +272,10 @@ class TestPrepareForPhone(unittest.TestCase):
         copied_folder = pathlib.Path(tempfile.mkdtemp())
         archive_folder = pathlib.Path(tempfile.mkdtemp())
 
-        prepare_for_phone.process_and_move_files_over(
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, True
         )
+        self.assertEqual([], moved_files)
 
         self.assertCountEqual(
             _list_of_full_podcast_episodes_to_list_of_names(unprocessed_files),
@@ -273,9 +285,13 @@ class TestPrepareForPhone(unittest.TestCase):
         self.assertEqual([], os.listdir(archive_folder))
 
         # Moved folder should have all the files.
-        prepare_for_phone.process_and_move_files_over(
+        expected_moved_files = [
+            copied_folder.joinpath(file.path.name) for file in unprocessed_files
+        ]
+        moved_files = prepare_for_phone.process_and_move_files_over(
             unprocessed_files, copied_folder, archive_folder, False
         )
+        self.assertCountEqual(moved_files, expected_moved_files)
         self.assertEqual([], os.listdir(podcast_test_show.podcast_folder))
         self.assertCountEqual(
             _list_of_full_podcast_episodes_to_list_of_names(unprocessed_files),
