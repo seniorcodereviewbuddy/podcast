@@ -33,17 +33,19 @@ class AndroidPhone(object):
         self.podcast_directory = podcast_directory
         self.history_file = history_file
 
-    def connected_to_phone(self, retry: bool = True) -> bool:
+    def connect_to_phone(self, retry: bool = True) -> bool:
         while True:
             if is_phone_connected(self.phone_name):
                 return True
-            else:
-                if retry and user_input.prompt_yes_or_no(
-                    "Didn't find phone (%s), try again?" % (self.phone_name)
-                ):
-                    continue
-                else:
-                    return False
+
+            if not retry:
+                return False
+
+            user_wants_to_retry = user_input.prompt_yes_or_no(
+                "Didn't find phone (%s), try again?" % (self.phone_name)
+            )
+            if not user_wants_to_retry:
+                return False
 
     class CopyFilesToPhoneResults(typing.NamedTuple):
         copied: set[pathlib.Path]
