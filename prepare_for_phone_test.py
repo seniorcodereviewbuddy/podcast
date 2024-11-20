@@ -590,6 +590,41 @@ class TestPrepareForPhone(unittest.TestCase):
                 user_prompt=lambda x: True,
             )
 
+    def test_get_podcast_episodes_summary_no_episodes(self) -> None:
+        summary = prepare_for_phone.get_podcast_episodes_summary([])
+        expected_summary = "No Potential Files"
+        self.assertEqual(summary, expected_summary)
+
+    def test_get_podcast_episodes_summary_with_episodes(self) -> None:
+        episodes = [
+            full_podcast_episode.FullPodcastEpisode(
+                index=0,
+                path=pathlib.Path("Show 1"),
+                podcast_show_name="fake_show",
+                speed=1.0,
+                archive=archive.Archive.NO,
+                modification_time=datetime.datetime.now(),
+                duration=datetime.timedelta(minutes=15),
+            ),
+            full_podcast_episode.FullPodcastEpisode(
+                index=1,
+                path=pathlib.Path("Show 2"),
+                podcast_show_name="fake_show",
+                speed=1.0,
+                archive=archive.Archive.NO,
+                modification_time=datetime.datetime.now(),
+                duration=datetime.timedelta(minutes=20),
+            ),
+        ]
+
+        summary = prepare_for_phone.get_podcast_episodes_summary(episodes)
+
+        expected_summary = """Potential Files:
+fake_show: Show 1 0:15:00
+fake_show: Show 2 0:20:00
+2 files in total, duration of 0:35:00"""
+        self.assertEqual(summary, expected_summary)
+
 
 if __name__ == "__main__":
     unittest.main()
