@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import pathlib
@@ -79,8 +80,11 @@ class Settings(object):
                 )
 
         self._NUM_OLDEST_EPISODES_TO_ADD = int(raw_json["NUM_OLDEST_EPISODES_TO_ADD"])
-        self._TIME_OF_PODCASTS_TO_ADD_IN_HOURS = int(
+        time_of_podcasts_to_add_in_hours = int(
             raw_json["TIME_OF_PODCASTS_TO_ADD_IN_HOURS"]
+        )
+        self._TIME_OF_PODCASTS_TO_ADD = datetime.timedelta(
+            hours=time_of_podcasts_to_add_in_hours
         )
 
         self._PODCASTS = podcasts
@@ -115,8 +119,8 @@ class Settings(object):
         return self._NUM_OLDEST_EPISODES_TO_ADD
 
     @property
-    def time_of_podcasts_to_add_in_hours(self) -> int:
-        return self._TIME_OF_PODCASTS_TO_ADD_IN_HOURS
+    def time_of_podcasts_to_add(self) -> datetime.timedelta:
+        return self._TIME_OF_PODCASTS_TO_ADD
 
     @property
     def podcasts(self) -> typing.List[podcast_show.PodcastShow]:
