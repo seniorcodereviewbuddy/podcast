@@ -176,6 +176,8 @@ def process_and_move_files_over(
                 all_files_delete = False
                 print("%s wasn't deleted, check if it was converted." % (file.path,))
 
+        # TODO(https://github.com/seniorcodereviewbuddy/podcast/issues/53)
+        # Add a custom exception instead of using Exception.
         if not all_files_delete:
             raise Exception("Failed to delete all files")
 
