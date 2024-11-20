@@ -36,7 +36,7 @@ class TestE2E(unittest.TestCase):
     def tearDown(self) -> None:
         self.root.cleanup()
 
-    def default_shows(self) -> list[podcast_show.PodcastShow]:
+    def required_shows(self) -> list[podcast_show.PodcastShow]:
         # TODO: Maybe these shouldn't be living in the same folder? Or they should be
         # handled in a better way.
         return [
@@ -82,7 +82,9 @@ class TestE2E(unittest.TestCase):
         settings_file = pathlib.Path(self.root.name, "user_settings.json")
         with open(settings_file, "w") as f:
             f.write(json.dumps(raw_settings))
-        user_podcasts = podcasts if podcasts else []
+        user_podcasts = self.required_shows()
+        if podcasts:
+            user_podcasts += podcasts
         specified_files: typing.Dict[pathlib.Path, typing.List[pathlib.Path]] = {}
 
         return settings.Settings(
@@ -171,7 +173,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
 
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.default_shows() + [
+        podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
@@ -226,7 +228,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
 
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.default_shows() + [
+        podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
@@ -275,7 +277,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder = pathlib.Path(self.root.name, "Podcasts")
         podcast_folder.mkdir()
         podcast_show_folder = podcast_folder.joinpath("show_1")
-        podcast_shows = self.default_shows() + [
+        podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
@@ -326,7 +328,7 @@ class TestE2E(unittest.TestCase):
         episodes = self._populate_podcast_show(podcast_show_folder)
 
         args: list[str] = []
-        podcast_shows = self.default_shows() + [
+        podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
 
@@ -375,7 +377,7 @@ class TestE2E(unittest.TestCase):
         podcast_folder.mkdir()
         podcast_show_folder = podcast_folder.joinpath("show_1")
 
-        podcast_shows = self.default_shows() + [
+        podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
 
