@@ -87,7 +87,7 @@ class TestPodcast(unittest.TestCase):
         saved = io.StringIO()
         p.save(saved)
 
-        want = "%s\nNone\n0\n" % (podcast_folder)
+        want = "%s\nNone\n0\n" % (podcast_folder.name)
         self.assertEqual(want, saved.getvalue())
 
         p.load(io.StringIO(saved.getvalue()))
@@ -112,7 +112,7 @@ class TestPodcast(unittest.TestCase):
         p.save(saved)
 
         want = "%s\n2\n1\n%s\n1\n%d\n%d\n" % (
-            podcast_folder,
+            podcast_folder.name,
             podcast_file,
             test_utils.TEST_FILE_LENGTH_IN_SECONDS,
             now,
@@ -130,7 +130,7 @@ class TestPodcast(unittest.TestCase):
         saved = io.StringIO()
         p.save(saved)
 
-        want = "%s\n2\n0\n" % (podcast_folder)
+        want = "%s\n2\n0\n" % (podcast_folder.name)
         self.assertEqual(want, saved.getvalue())
 
         p.load(io.StringIO(saved.getvalue()))
@@ -155,13 +155,14 @@ class TestPodcast(unittest.TestCase):
             os.remove(pathlib.Path(folder, podcast_file))
 
         p = podcast_show.PodcastShow(
-            pathlib.Path("my_podcast"), podcast_show.P0, preprocess=clear_file
+            podcast_folder, podcast_show.P0, preprocess=clear_file
         )
         p.scan_for_updates(self.root)
         self.assertFalse(os.path.exists(podcast_file))
 
     def test_bad_load(self) -> None:
-        p = podcast_show.PodcastShow(pathlib.Path("my_podcast"), podcast_show.P0)
+        podcast_folder = pathlib.Path(self.root, "my_podcast")
+        p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
         self.assertIsNone(p.load(io.StringIO("bad_podcast\n0\n")))
 
     def test_get_episode_present(self) -> None:

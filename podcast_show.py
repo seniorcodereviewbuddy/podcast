@@ -27,6 +27,7 @@ class PodcastShow(object):
             podcast_preprocessing_base.PreProcess_TypeAlias
         ] = None,
     ):
+        assert podcast_folder.is_absolute(), "podcast_folder must be an absolute path"
         self.podcast_folder = podcast_folder
         self.podcast_name = podcast_folder.name
         self.priority = priority
@@ -75,11 +76,11 @@ class PodcastShow(object):
         return self.podcast_folder >= other.podcast_folder
 
     def load(self, f: typing.TextIO) -> typing.Optional["PodcastShow"]:
-        loading_path = pathlib.Path(f.readline().strip())
-        if loading_path != self.podcast_folder:
+        loading_path = f.readline().strip()
+        if loading_path != self.podcast_folder.name:
             print(
                 "Attempted to load podcast %s into %s"
-                % (loading_path, self.podcast_folder)
+                % (loading_path, self.podcast_folder.name)
             )
             return None
 
@@ -96,7 +97,7 @@ class PodcastShow(object):
         return self
 
     def save(self, f: typing.TextIO) -> None:
-        f.write(str(self.podcast_folder) + "\n")
+        f.write(str(self.podcast_folder.name) + "\n")
         f.write(str(self.next_index) + "\n")
         f.write(str(len(self.episodes)) + "\n")
         for episode in self.episodes:

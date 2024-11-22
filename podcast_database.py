@@ -62,10 +62,10 @@ class PodcastDatabase(object):
             num_podcasts = int(f.readline())
             self._log("Loading %d podcasts from %s" % (num_podcasts, path))
             for p in range(num_podcasts):
-                podcast_folder = pathlib.Path(f.readline().strip())
+                podcast_folder = f.readline().strip()
                 match_found = False
                 for possible_podcast in self.podcast_shows:
-                    if possible_podcast.podcast_folder == podcast_folder:
+                    if possible_podcast.podcast_folder.name == podcast_folder:
                         possible_podcast.load(f)
                         loaded += 1
                         match_found = True
@@ -83,8 +83,10 @@ class PodcastDatabase(object):
                     if no_match_found_user_response == remove_keyword:
                         # Since this removed podcast is still in the database file, we load it to parse it from the file, but
                         # then don't save this data anywhere since we no longer want it.
+                        # Not that PodcastShow requires absolute paths, so we create an absolute path to this podcast, which won't exist.
+                        full_path = pathlib.Path(podcast_folder).absolute()
                         podcast_show.PodcastShow(
-                            podcast_folder, podcast_show.PRIORITY_SKIP
+                            full_path, podcast_show.PRIORITY_SKIP
                         ).load(f)
                     else:
                         raise DatabaseLoadingError(
@@ -96,7 +98,7 @@ class PodcastDatabase(object):
         with open(path, "w", encoding="utf-8") as f:
             f.write(str(len(self.podcast_shows)) + "\n")
             for pod in sorted(self.podcast_shows):
-                f.write(str(pod.podcast_folder) + "\n")
+                f.write(str(pod.podcast_folder.name) + "\n")
                 pod.save(f)
 
     def update_podcasts(self, allow_prompt: bool = True) -> None:
@@ -163,7 +165,7 @@ class PodcastDatabase(object):
                 f.write(
                     "%s: total duration of %s, %d episodes, %s long on average\n"
                     % (
-                        x.podcast_folder,
+                        x.podcast_folder.name,
                         time_helper.seconds_to_string(total_duration),
                         len(remaining_episodes),
                         time_helper.seconds_to_string(average_duration),
