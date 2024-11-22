@@ -61,9 +61,8 @@ class TestPodcastDatabase(unittest.TestCase):
         database.load(database_file)
 
     def test_save_and_load_basic(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        os.mkdir(podcast_folder)
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -91,7 +90,7 @@ class TestPodcastDatabase(unittest.TestCase):
         episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_élè.mp3"]
         now = 666
         for index, episode in enumerate(episodes):
-            full_path = pathlib.Path(podcast_folder, episode)
+            full_path = pathlib.Path(known_folder, episode)
             shutil.copyfile(
                 pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
                 full_path,
@@ -105,7 +104,7 @@ class TestPodcastDatabase(unittest.TestCase):
         contents = file_contents(database_file)
         want = "1\nknown_folder\nknown_folder\n4\n3\n"
         for index, episode in enumerate(episodes):
-            full_path = pathlib.Path(podcast_folder, episode)
+            full_path = pathlib.Path(known_folder, episode)
             want += "%s\n%d\n%d\n%d\n" % (
                 full_path,
                 index + 1,
@@ -117,16 +116,15 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual(1, database.load(database_file))
 
         # Delete the folder and ensure we save nothing.
-        shutil.rmtree(podcast_folder)
+        shutil.rmtree(known_folder)
         database.update_podcasts()
 
         database.save(database_file)
         self.assertEqual("0\n", file_contents(database_file))
 
     def test_save_and_load_podcast_removed(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        os.mkdir(podcast_folder)
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -163,9 +161,8 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("0\n", file_contents(database_file))
 
     def test_get_podcast_episodes_by_priority(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        os.mkdir(podcast_folder)
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -175,7 +172,7 @@ class TestPodcastDatabase(unittest.TestCase):
         expected_selected_episodes = []
         now = 666
         for index, episode_name in enumerate(episodes_names):
-            full_path = pathlib.Path(podcast_folder, episode_name)
+            full_path = pathlib.Path(known_folder, episode_name)
             utime = now + 100 * index
 
             expected_selected_episodes.append(
@@ -225,7 +222,7 @@ class TestPodcastDatabase(unittest.TestCase):
         )
 
     def test_get_podcast_episodes_by_priority_test_ignore(self) -> None:
-        known_folder = pathlib.Path("known_folder")
+        known_folder = pathlib.Path(self.root, "known_folder")
         episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
         show = self._create_podcast_show(known_folder, podcast_show.P1, episodes, 666)
         podcast_shows = [show]
@@ -263,9 +260,8 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertFalse(results)
 
     def test_get_oldest_files(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        os.mkdir(podcast_folder)
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -274,7 +270,7 @@ class TestPodcastDatabase(unittest.TestCase):
         episodes = ["podcast_1.mp3", "podcast_2.mp3", "podcast_3.mp3"]
         now = 666
         for index, episode in enumerate(episodes):
-            full_path = pathlib.Path(podcast_folder, episode)
+            full_path = pathlib.Path(known_folder, episode)
             shutil.copyfile(
                 pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
                 full_path,
@@ -322,12 +318,10 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("podcast_3.mp3", os.path.basename(results[1].path))
 
     def test_get_oldest_files_from_multiple(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        known_folder_2 = pathlib.Path("known_folder_2")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        podcast_folder_2 = pathlib.Path(self.root, known_folder_2)
-        os.mkdir(podcast_folder)
-        os.mkdir(podcast_folder_2)
+        known_folder = pathlib.Path(self.root,"known_folder")
+        known_folder.mkdir()
+        known_folder_2 = pathlib.Path(self.root,"known_folder_2")
+        known_folder_2.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P2),
@@ -338,7 +332,7 @@ class TestPodcastDatabase(unittest.TestCase):
         for podcast_index, p in enumerate(podcast_shows):
             podcast_time = podcast_index * 1000 + now
             for episode_index, episode in enumerate(episodes):
-                full_path = pathlib.Path(self.root, p.podcast_folder, episode)
+                full_path = pathlib.Path(p.podcast_folder, episode)
                 shutil.copyfile(
                     pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
                     full_path,
@@ -355,12 +349,12 @@ class TestPodcastDatabase(unittest.TestCase):
         database.update_podcasts(allow_prompt=False)
 
         expected_episodes_by_age = [
-            pathlib.Path(self.root, known_folder, episodes[0]),
-            pathlib.Path(self.root, known_folder, episodes[1]),
-            pathlib.Path(self.root, known_folder, episodes[2]),
-            pathlib.Path(self.root, known_folder_2, episodes[0]),
-            pathlib.Path(self.root, known_folder_2, episodes[1]),
-            pathlib.Path(self.root, known_folder_2, episodes[2]),
+            pathlib.Path(known_folder, episodes[0]),
+            pathlib.Path(known_folder, episodes[1]),
+            pathlib.Path(known_folder, episodes[2]),
+            pathlib.Path(known_folder_2, episodes[0]),
+            pathlib.Path(known_folder_2, episodes[1]),
+            pathlib.Path(known_folder_2, episodes[2]),
         ]
 
         for i in range(1, len(expected_episodes_by_age) + 1):
@@ -370,21 +364,19 @@ class TestPodcastDatabase(unittest.TestCase):
                 self.assertEqual(expected_episodes_by_age[q], results[q].path)
 
     def test_repeated_path(self) -> None:
-        known_folder = pathlib.Path("repeated_folder")
+        known_folder = pathlib.Path(self.root, "repeated_folder")
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
         ]
         with self.assertRaises(Exception):
-            podcast_database.PodcastDatabase(pathlib.Path("root"), podcast_shows, False)
+            podcast_database.PodcastDatabase(self.root, podcast_shows, False)
 
     def test_stats(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        known_folder_2 = pathlib.Path("known_folder_2")
-        podcast_folder = pathlib.Path(self.root, known_folder)
-        podcast_folder_2 = pathlib.Path(self.root, known_folder_2)
-        os.mkdir(podcast_folder)
-        os.mkdir(podcast_folder_2)
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
+        known_folder_2 = pathlib.Path(self.root, "known_folder_2")
+        known_folder_2.mkdir()
 
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
@@ -392,27 +384,27 @@ class TestPodcastDatabase(unittest.TestCase):
         ]
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder, "podcast_1.mp3"),
+            pathlib.Path(known_folder, "podcast_1.mp3"),
         )
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder, "podcast_2.mp3"),
+            pathlib.Path(known_folder, "podcast_2.mp3"),
         )
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder, "podcast_3.mp3"),
+            pathlib.Path(known_folder, "podcast_3.mp3"),
         )
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder_2, "podcast_1.mp3"),
+            pathlib.Path(known_folder_2, "podcast_1.mp3"),
         )
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder_2, "podcast_2.mp3"),
+            pathlib.Path(known_folder_2, "podcast_2.mp3"),
         )
         shutil.copyfile(
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
-            pathlib.Path(podcast_folder_2, "podcast_3.mp3"),
+            pathlib.Path(known_folder_2, "podcast_3.mp3"),
         )
 
         database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)

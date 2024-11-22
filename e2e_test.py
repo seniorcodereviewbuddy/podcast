@@ -30,6 +30,9 @@ class TestE2E(unittest.TestCase):
     def setUp(self) -> None:
         self.root = tempfile.TemporaryDirectory()
 
+        self.podcast_folder = pathlib.Path(self.root.name, "Podcasts")
+        self.podcast_folder.mkdir()
+
         # Verify the emulator is ready and we can connect.
         self.assertTrue(android_phone.is_phone_connected(TestE2E.phone_emulator.id))
 
@@ -42,13 +45,13 @@ class TestE2E(unittest.TestCase):
         # handled in a better way.
         return [
             podcast_show.PodcastShow(
-                pathlib.Path("Add To Phone"), podcast_show.PRIORITY_SKIP
+                self.podcast_folder.joinpath("Add To Phone"), podcast_show.PRIORITY_SKIP
             ),
             podcast_show.PodcastShow(
-                pathlib.Path("Archive"), podcast_show.PRIORITY_SKIP
+                self.podcast_folder.joinpath("Archive"), podcast_show.PRIORITY_SKIP
             ),
             podcast_show.PodcastShow(
-                pathlib.Path("On Phone"), podcast_show.PRIORITY_SKIP
+                self.podcast_folder.joinpath("On Phone"), podcast_show.PRIORITY_SKIP
             ),
         ]
 
@@ -56,15 +59,14 @@ class TestE2E(unittest.TestCase):
         self,
         phone_id: str,
         android_podcast_folder: pathlib.Path,
-        computer_podcast_folder: pathlib.Path,
         podcasts: typing.Optional[list[podcast_show.PodcastShow]] = None,
         hours_to_add: int = 0,
     ) -> settings.Settings:
-        processed_folder = pathlib.Path(computer_podcast_folder, "Add To Phone")
+        processed_folder = self.podcast_folder.joinpath("Add To Phone")
 
-        archive_folder = pathlib.Path(computer_podcast_folder, "Archive")
+        archive_folder = self.podcast_folder.joinpath("Archive")
 
-        backup_folder = pathlib.Path(computer_podcast_folder, "On Phone")
+        backup_folder = self.podcast_folder.joinpath("On Phone")
 
         user_data_folder = pathlib.Path(self.root.name, "user_data")
 
@@ -73,7 +75,7 @@ class TestE2E(unittest.TestCase):
             "PODCAST_DIRECTORY_ON_PHONE": f"{android_podcast_folder}",
             "NUM_OLDEST_EPISODES_TO_ADD": 1,
             "TIME_OF_PODCASTS_TO_ADD_IN_HOURS": f"{hours_to_add}",
-            "PODCAST_FOLDER": f"{computer_podcast_folder}",
+            "PODCAST_FOLDER": f"{self.podcast_folder}",
             "PROCESSED_FILE_BOARDING_ZONE_FOLDER": f"{processed_folder}",
             "ARCHIVE_FOLDER": f"{archive_folder}",
             "BACKUP_FOLDER": f"{backup_folder}",
@@ -101,8 +103,7 @@ class TestE2E(unittest.TestCase):
         episodes_start_time: int = 1000,
         file_prefix: str = "",
     ) -> list[pathlib.Path]:
-        podcast_folder = pathlib.Path(self.root.name, podcast_dir)
-        podcast_folder.mkdir(exist_ok=True)
+        podcast_dir.mkdir(exist_ok=True)
 
         test_files = [
             pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
@@ -123,7 +124,7 @@ class TestE2E(unittest.TestCase):
         for x in range(num_episodes):
             test_file = test_files[x % len(test_files)]
             new_file_name = file_prefix + test_file.stem + str(x + 1) + test_file.suffix
-            copied_file = pathlib.Path(podcast_folder, new_file_name)
+            copied_file = podcast_dir.joinpath(new_file_name)
             show_files.append(copied_file)
 
             shutil.copyfile(
@@ -148,12 +149,9 @@ class TestE2E(unittest.TestCase):
         ]
 
         args: list[str] = []
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
         )
         prepare_for_phone.main(args, test_settings)
 
@@ -170,10 +168,7 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = ["--dry_run"]
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
-
-        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
@@ -183,7 +178,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=0,
         )
@@ -220,10 +214,7 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = []
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
-
-        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
@@ -233,7 +224,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=0,
         )
@@ -275,10 +265,8 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = []
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
 
-        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),
         ]
@@ -288,7 +276,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=0,
         )
@@ -325,9 +312,7 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = []
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
-        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
         ]
@@ -337,7 +322,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=100,
         )
@@ -372,10 +356,7 @@ class TestE2E(unittest.TestCase):
             "Y",
         ] * times_to_run
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
-
-        podcast_show_folder = pathlib.Path(podcast_folder, "show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
         episodes = self._populate_podcast_show(podcast_show_folder)
 
         args: list[str] = []
@@ -386,7 +367,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=0,
         )
@@ -424,9 +404,7 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = []
 
-        podcast_folder = pathlib.Path(self.root.name, "Podcasts")
-        podcast_folder.mkdir()
-        podcast_show_folder = podcast_folder.joinpath("show_1")
+        podcast_show_folder = self.podcast_folder.joinpath("show_1")
 
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P0),
@@ -440,7 +418,6 @@ class TestE2E(unittest.TestCase):
         test_settings = self.create_test_settings(
             TestE2E.phone_emulator.id,
             TestE2E.phone_emulator.create_new_podcast_folder(),
-            podcast_folder,
             podcast_shows,
             hours_to_add=100,
         )
