@@ -131,16 +131,11 @@ class PodcastDatabase(object):
         self,
         path: pathlib.Path,
         date: typing.Optional[datetime.datetime] = None,
-        files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> None:
         date = datetime.datetime.now() if date is None else date
         podcast_shows = self._get_all_podcast_shows_sorted_by_priority()
-        num_remaining_episodes = sum(
-            len(x.remaining_episodes(files_to_ignore)) for x in podcast_shows
-        )
-        remaining_duration = sum(
-            x.remaining_time(files_to_ignore) for x in podcast_shows
-        )
+        num_remaining_episodes = sum(len(x.remaining_episodes()) for x in podcast_shows)
+        remaining_duration = sum(x.remaining_time() for x in podcast_shows)
 
         with open(path, "a", encoding="utf-8") as f:
             f.write(
@@ -155,16 +150,15 @@ class PodcastDatabase(object):
     def log_stats(
         self,
         path: pathlib.Path,
-        files_to_ignore: typing.Optional[typing.List[pathlib.Path]] = None,
     ) -> None:
         podcast_shows = self._get_all_podcast_shows_sorted_by_priority()
 
         with open(path, "w", encoding="utf-8") as f:
             for x in podcast_shows:
-                remaining_episodes = x.remaining_episodes(files_to_ignore)
+                remaining_episodes = x.remaining_episodes()
                 if not remaining_episodes:
                     continue
-                total_duration = x.remaining_time(files_to_ignore)
+                total_duration = x.remaining_time()
                 average_duration = total_duration / len(remaining_episodes)
                 f.write(
                     "%s: total duration of %s, %d episodes, %s long on average\n"
