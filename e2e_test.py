@@ -265,7 +265,6 @@ class TestE2E(unittest.TestCase):
 
         args: list[str] = []
 
-
         podcast_show_folder = self.podcast_folder.joinpath("show_1")
         podcast_shows = [
             podcast_show.PodcastShow(podcast_show_folder, podcast_show.P1),

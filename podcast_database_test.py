@@ -318,9 +318,9 @@ class TestPodcastDatabase(unittest.TestCase):
         self.assertEqual("podcast_3.mp3", os.path.basename(results[1].path))
 
     def test_get_oldest_files_from_multiple(self) -> None:
-        known_folder = pathlib.Path(self.root,"known_folder")
+        known_folder = pathlib.Path(self.root, "known_folder")
         known_folder.mkdir()
-        known_folder_2 = pathlib.Path(self.root,"known_folder_2")
+        known_folder_2 = pathlib.Path(self.root, "known_folder_2")
         known_folder_2.mkdir()
 
         podcast_shows = [
