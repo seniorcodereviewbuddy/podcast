@@ -24,11 +24,9 @@ class PodcastEpisodePathError(Exception):
 class PodcastDatabase(object):
     def __init__(
         self,
-        root: pathlib.Path,
         podcast_shows: typing.List[podcast_show.PodcastShow],
         verbose: bool,
     ):
-        self.root = root
         self.podcast_shows = podcast_shows
         self.verbose = verbose
 
@@ -106,14 +104,14 @@ class PodcastDatabase(object):
         self.podcast_shows = [
             podcast_show
             for podcast_show in self.podcast_shows
-            if pathlib.Path(self.root, podcast_show.podcast_folder).is_dir()
+            if podcast_show.podcast_folder.is_dir()
         ]
 
         for pod in self.podcast_shows:
             if pod.priority == podcast_show.PRIORITY_SKIP:
                 print("Skipping %s" % (pod))
                 continue
-            pod.scan_for_updates(self.root, allow_prompt=allow_prompt)
+            pod.scan_for_updates(allow_prompt=allow_prompt)
 
     def _get_all_podcast_shows_sorted_by_priority(
         self,
@@ -280,9 +278,7 @@ class PodcastDatabase(object):
                 )
 
             for episode_path in episode_paths:
-                full_potential_path = pathlib.Path(
-                    self.root, show.podcast_folder, episode_path
-                )
+                full_potential_path = show.podcast_folder.joinpath(episode_path)
                 matching_episode = show.get_episode(full_potential_path)
                 if not matching_episode:
                     raise PodcastEpisodePathError(

@@ -1,5 +1,4 @@
 import datetime
-import os
 import pathlib
 import typing
 
@@ -103,24 +102,17 @@ class PodcastShow(object):
         for episode in self.episodes:
             episode.save(f)
 
-    # TODO: This feels like it shouldn't need root, the class should have it's full path, it doesn't need root.
-    def scan_for_updates(
-        self, root: pathlib.Path, allow_prompt: bool = True
-    ) -> typing.List[pathlib.Path]:
+    def scan_for_updates(self, allow_prompt: bool = True) -> typing.List[pathlib.Path]:
         print("Scanning for Updates for %s" % (self.podcast_folder))
-        full_folder_path = pathlib.Path(root, self.podcast_folder)
         if self.preprocess:
             print("Executing preprocess for %s" % (self.podcast_folder))
             self.preprocess(
-                full_folder_path,
+                self.podcast_folder,
                 # TODO: this isn't getting tested, becuase this is asking for user inputs and it isn't being mocked out.
                 podcast_preprocessing_base.prompt_for_delete,
             )
 
-        files_present = frozenset(
-            pathlib.Path(full_folder_path, f).absolute()
-            for f in os.listdir(full_folder_path)
-        )
+        files_present = frozenset(f.absolute() for f in self.podcast_folder.iterdir())
         # Remove the files that are no longer present.
         self.episodes = [
             episode for episode in self.episodes if episode.path in files_present
@@ -130,7 +122,7 @@ class PodcastShow(object):
 
         new_episodes = []
         for f in files_present.difference(known_files):
-            full_path = pathlib.Path(full_folder_path, f).absolute()
+            full_path = self.podcast_folder.joinpath(f).absolute()
             if not podcast_episode.is_podcast_file(full_path):
                 continue
 

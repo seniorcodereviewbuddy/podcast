@@ -46,7 +46,7 @@ class TestPodcast(unittest.TestCase):
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
         self.assertEqual([], p.remaining_episodes())
 
-        p.scan_for_updates(self.root, allow_prompt=False)
+        p.scan_for_updates(allow_prompt=False)
 
         self.assertEqual(len(files), len(p.remaining_episodes()))
         self.assertEqual(
@@ -103,10 +103,8 @@ class TestPodcast(unittest.TestCase):
         now = 1330712222
         os.utime(podcast_file, (now, now))
 
-        self.assertEqual(
-            [podcast_file], p.scan_for_updates(self.root, allow_prompt=False)
-        )
-        self.assertEqual([], p.scan_for_updates(self.root, allow_prompt=False))
+        self.assertEqual([podcast_file], p.scan_for_updates(allow_prompt=False))
+        self.assertEqual([], p.scan_for_updates(allow_prompt=False))
 
         saved = io.StringIO()
         p.save(saved)
@@ -125,7 +123,7 @@ class TestPodcast(unittest.TestCase):
         # Remove the file and ensure we revert back to the original state.
         os.remove(podcast_file)
 
-        self.assertEqual([], p.scan_for_updates(self.root, allow_prompt=False))
+        self.assertEqual([], p.scan_for_updates(allow_prompt=False))
 
         saved = io.StringIO()
         p.save(saved)
@@ -157,7 +155,7 @@ class TestPodcast(unittest.TestCase):
         p = podcast_show.PodcastShow(
             podcast_folder, podcast_show.P0, preprocess=clear_file
         )
-        p.scan_for_updates(self.root)
+        p.scan_for_updates()
         self.assertFalse(os.path.exists(podcast_file))
 
     def test_bad_load(self) -> None:
@@ -178,7 +176,7 @@ class TestPodcast(unittest.TestCase):
         os.utime(full_path, (now, now))
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        p.scan_for_updates(self.root, allow_prompt=False)
+        p.scan_for_updates(allow_prompt=False)
 
         expected_value = full_podcast_episode.FullPodcastEpisode(
             1,
@@ -202,7 +200,7 @@ class TestPodcast(unittest.TestCase):
         )
 
         p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
-        p.scan_for_updates(self.root, allow_prompt=False)
+        p.scan_for_updates(allow_prompt=False)
 
         self.assertFalse(p.get_episode(pathlib.Path("fake_path")))
 
