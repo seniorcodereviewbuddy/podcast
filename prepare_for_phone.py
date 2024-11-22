@@ -45,7 +45,7 @@ def find_unknown_folders(
             continue
 
         if item.name not in expected_folders:
-            unknown_folders.append(pathlib.Path(item.name))
+            unknown_folders.append(item)
 
     return unknown_folders
 

@@ -74,8 +74,8 @@ class TestPrepareForPhone(unittest.TestCase):
         return show
 
     def test_find_unknown_folders_only_unknown(self) -> None:
-        unknown_folder = pathlib.Path("unknown_folder")
-        os.mkdir(pathlib.Path(self.root, unknown_folder))
+        unknown_folder = pathlib.Path(self.root, "unknown_folder")
+        unknown_folder.mkdir()
 
         self.assertEqual(
             prepare_for_phone.find_unknown_folders(self.root, expected_folders=[]),
@@ -83,8 +83,8 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
     def test_find_unknown_folders_only_known(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        os.mkdir(pathlib.Path(self.root, known_folder))
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
         self.assertEqual(
             prepare_for_phone.find_unknown_folders(
@@ -94,11 +94,11 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
     def test_find_unknown_folders_known_and_unknown(self) -> None:
-        known_folder = pathlib.Path("known_folder")
-        os.mkdir(pathlib.Path(self.root, known_folder))
+        known_folder = pathlib.Path(self.root, "known_folder")
+        known_folder.mkdir()
 
-        unknown_folder = pathlib.Path("unknown_folder")
-        os.mkdir(pathlib.Path(self.root, unknown_folder))
+        unknown_folder = pathlib.Path(self.root, "unknown_folder")
+        unknown_folder.mkdir()
 
         self.assertEqual(
             prepare_for_phone.find_unknown_folders(
@@ -108,7 +108,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
     def test_validate_podcast_folders_known_folder_present(self) -> None:
-        known_folder = pathlib.Path("known_folder")
+        known_folder = pathlib.Path(self.root, "known_folder")
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
         ]
@@ -120,8 +120,8 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
     def test_validate_podcast_folders_unknown_folder_present(self) -> None:
-        unknown_folder = pathlib.Path("unknown_folder")
-        os.mkdir(pathlib.Path(self.root, unknown_folder))
+        unknown_folder = pathlib.Path(self.root, "unknown_folder")
+        unknown_folder.mkdir()
 
         with self.assertRaises(prepare_for_phone.UnknownPodcastFoldersError):
             prepare_for_phone.validate_podcast_folders(self.root, podcast_shows=[])
@@ -129,13 +129,13 @@ class TestPrepareForPhone(unittest.TestCase):
     def test_validate_podcast_folders_known_and_unknowns_folders_present(
         self,
     ) -> None:
-        known_folder = pathlib.Path("known_folder")
+        known_folder = pathlib.Path(self.root, "known_folder")
         podcast_shows = [
             podcast_show.PodcastShow(known_folder, podcast_show.P1),
         ]
 
-        unknown_folder = pathlib.Path("unknown_folder")
-        os.mkdir(pathlib.Path(self.root, unknown_folder))
+        unknown_folder = pathlib.Path(self.root, "unknown_folder")
+        unknown_folder.mkdir()
 
         with self.assertRaises(prepare_for_phone.UnknownPodcastFoldersError):
             prepare_for_phone.validate_podcast_folders(
