@@ -265,7 +265,6 @@ def main(
     validate_podcast_folders(user_settings.podcast_folder, user_settings.podcasts)
 
     database = podcast_database.PodcastDatabase(
-        user_settings.podcast_folder,
         user_settings.podcasts,
         parsed_args.verbose,
     )

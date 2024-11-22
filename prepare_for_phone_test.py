@@ -69,7 +69,7 @@ class TestPrepareForPhone(unittest.TestCase):
                 os.utime(episode_path, (new_time, new_time))
 
         show = podcast_show.PodcastShow(podcast_folder, priority)
-        show.scan_for_updates(self.root, allow_prompt=False)
+        show.scan_for_updates(allow_prompt=False)
 
         return show
 
@@ -169,9 +169,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
         podcast_test_show.archive = archive.Archive.YES
 
-        database = podcast_database.PodcastDatabase(
-            self.root, [podcast_test_show], False
-        )
+        database = podcast_database.PodcastDatabase([podcast_test_show], False)
         database.update_podcasts(allow_prompt=False)
 
         unprocessed_files = podcast_test_show.remaining_episodes()
@@ -220,9 +218,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
         podcast_test_show.archive = archive.Archive.NO
 
-        database = podcast_database.PodcastDatabase(
-            self.root, [podcast_test_show], False
-        )
+        database = podcast_database.PodcastDatabase([podcast_test_show], False)
         database.update_podcasts(allow_prompt=False)
 
         unprocessed_files = podcast_test_show.remaining_episodes()
@@ -285,11 +281,9 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_test_show = podcast_show.PodcastShow(
             podcast_folder, podcast_show.P0, archive=archive.Archive.YES
         )
-        podcast_test_show.scan_for_updates(self.root, allow_prompt=False)
+        podcast_test_show.scan_for_updates(allow_prompt=False)
 
-        database = podcast_database.PodcastDatabase(
-            self.root, [podcast_test_show], False
-        )
+        database = podcast_database.PodcastDatabase([podcast_test_show], False)
         database.update_podcasts(allow_prompt=False)
 
         unprocessed_files = podcast_test_show.remaining_episodes()
@@ -342,7 +336,7 @@ class TestPrepareForPhone(unittest.TestCase):
         )
 
         podcast_shows = [priority_show, old_podcast_show]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         files = prepare_for_phone.get_batch_of_podcast_files(
@@ -387,7 +381,7 @@ class TestPrepareForPhone(unittest.TestCase):
             old_show,
             new_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         files = prepare_for_phone.get_batch_of_podcast_files(
@@ -432,7 +426,7 @@ class TestPrepareForPhone(unittest.TestCase):
             old_show,
             new_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         files = prepare_for_phone.get_batch_of_podcast_files(
@@ -472,7 +466,7 @@ class TestPrepareForPhone(unittest.TestCase):
             old_priority_show,
             new_low_priority_show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         files = prepare_for_phone.get_batch_of_podcast_files(
@@ -512,7 +506,7 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         oldest_episode = _get_x_oldest_episodes(show, 1)
@@ -537,7 +531,7 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         oldest_episode = _get_x_oldest_episodes(show, 1)
@@ -564,7 +558,7 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         oldest_episodes = _get_x_oldest_episodes(show, 2)
@@ -591,7 +585,7 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         oldest_episodes = _get_x_oldest_episodes(show, 3)
@@ -616,7 +610,7 @@ class TestPrepareForPhone(unittest.TestCase):
         podcast_shows = [
             show,
         ]
-        database = podcast_database.PodcastDatabase(self.root, podcast_shows, False)
+        database = podcast_database.PodcastDatabase(podcast_shows, False)
         database.update_podcasts(allow_prompt=False)
 
         with self.assertRaises(podcast_database.PodcastEpisodePathError):
