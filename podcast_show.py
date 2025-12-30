@@ -39,11 +39,6 @@ class PodcastShow(object):
     def __str__(self) -> str:
         return str(self.podcast_folder)
 
-    def __cmp__(self, other: typing.Any) -> bool:
-        if not isinstance(other, PodcastShow):
-            return NotImplemented
-        return self.podcast_folder < other.podcast_folder
-
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, PodcastShow):
             return False
