@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import io
 import os
 import subprocess
 import sys
 import typing
 
+import encoding_helper
 import run_tests
 
 ROOT_FOLDER = os.path.dirname(__file__)
-
-DESIRED_ENCODING = "utf-8"
 
 
 def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -20,7 +18,7 @@ def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
         args,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        encoding=DESIRED_ENCODING,
+        encoding=encoding_helper.DESIRED_ENCODING,
     )
     if result.stdout:
         print(result.stdout, flush=True)
@@ -28,21 +26,7 @@ def run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def main(args: typing.Optional[list[str]]) -> int:
-    if sys.stdout.encoding != DESIRED_ENCODING:
-        if sys.version_info < (3, 7) or not isinstance(sys.stdout, io.TextIOWrapper):
-            print(
-                "Script is run with incorrect stdout encoding and python version is too old to allow it to be automatically fixed."
-            )
-            print(
-                f"Please either run this script with stdout encoding as {DESIRED_ENCODING}, or increase python version to 3.7 or later."
-            )
-            return 1
-
-        print(
-            f"WARNING! This script will output {DESIRED_ENCODING} so it expects stdout to be in {DESIRED_ENCODING} encoding."
-        )
-        print(f"WARNING! Reconfiguring stdout encoding to be {DESIRED_ENCODING}")
-        sys.stdout.reconfigure(encoding=DESIRED_ENCODING)
+    encoding_helper.enforce_desired_stdout_encoding()
 
     parser = argparse.ArgumentParser(
         description="Prepare repo for submitting a change by running cleanups and checks"

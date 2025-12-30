@@ -4,6 +4,8 @@ import sys
 import typing
 import unittest
 
+import encoding_helper
+
 DEFAULT_TEST_PATTERN = "*_test.py"
 ROOT_FOLDER = os.path.dirname(__file__)
 
@@ -17,6 +19,9 @@ def discover_and_run_tests(start_dir: str, pattern: str, failfast: bool) -> int:
 
 
 def main(args: typing.Optional[list[str]]) -> int:
+    # Ensure stdout uses UTF-8 encoding to handle Unicode filenames in test output
+    encoding_helper.enforce_desired_stdout_encoding()
+
     parser = argparse.ArgumentParser(
         description="Helper script to run unit tests",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
