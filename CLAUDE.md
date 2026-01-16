@@ -18,13 +18,12 @@ conda activate podcast
 # 2. Run tests (do this FIRST to verify environment)
 python run_tests.py
 
-# 3. Check type compliance before making changes
-mypy --strict .
+# 3. Check type compliance using pre-commit (mypy runs through pre-commit)
+pre-commit run mypy --all-files
 
 # 4. After making changes, run all quality checks
-black .                    # Format code
-mypy --strict .           # Type check
-python run_tests.py       # Run tests
+pre-commit run --all-files    # Runs black, flake8, isort, mypy, ruff
+python run_tests.py           # Run tests
 
 # 5. Pre-commit hooks will run automatically on commit
 ```
