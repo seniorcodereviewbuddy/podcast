@@ -37,7 +37,7 @@ repos:
         additional_dependencies: [alembic==1.14.0, mutagen==1.47.0, sqlalchemy==2.0.36]
         exclude: ^alembic/
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.10
+  rev: v0.14.11
   hooks:
     # Only use ruff for pep8-naming for now.
     # Consider using it to replace the other tooling later.
