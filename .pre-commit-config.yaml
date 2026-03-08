@@ -22,6 +22,7 @@ repos:
     rev: 7.3.0
     hooks:
     -   id: flake8
+        exclude: ^alembic/
 -   repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
@@ -33,9 +34,10 @@ repos:
     hooks:
     -   id: mypy
         args: ["--strict"]
-        additional_dependencies: [mutagen==1.47.0]
+        additional_dependencies: [alembic==1.14.0, mutagen==1.47.0, sqlalchemy==2.0.36]
+        exclude: ^alembic/
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.10
+  rev: v0.14.11
   hooks:
     # Only use ruff for pep8-naming for now.
     # Consider using it to replace the other tooling later.
