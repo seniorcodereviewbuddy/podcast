@@ -2,4 +2,5 @@ podcast.sublime-workspace
 *.pyc
 *.bak
 user_data/
-.claude/
+.claude/settings.local.json
+.vscode/
