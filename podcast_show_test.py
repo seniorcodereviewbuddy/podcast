@@ -6,13 +6,31 @@ import shutil
 import tempfile
 import typing
 import unittest
+from collections.abc import Generator
+from contextlib import contextmanager
+
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 import archive
 import full_podcast_episode
+import models
 import podcast_episode
 import podcast_preprocessing_base
 import podcast_show
 import test_utils
+
+
+@contextmanager
+def create_test_db(root: pathlib.Path) -> Generator[Engine, None, None]:
+    """Create a test database and clean it up after use."""
+    db_path = root / "test.sqlite"
+    engine = models.get_engine(db_path)
+    models.init_db(engine)
+    try:
+        yield engine
+    finally:
+        engine.dispose()
 
 
 class TestPodcast(unittest.TestCase):
@@ -203,6 +221,103 @@ class TestPodcast(unittest.TestCase):
         p.scan_for_updates(allow_prompt=False)
 
         self.assertFalse(p.get_episode(pathlib.Path("fake_path")))
+
+    def test_save_to_db_and_load_from_db(self) -> None:
+        """Test saving and loading a show with episodes to/from SQLite."""
+        podcast_folder = pathlib.Path(self.root, "podcast")
+        os.mkdir(podcast_folder)
+
+        # Create a show with episodes
+        p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
+
+        # Add test files
+        now = 1330712222
+        files = ["podcast_1.mp3", "podcast_2.mp3"]
+        for x in files:
+            full_path = pathlib.Path(podcast_folder, x)
+            shutil.copyfile(
+                pathlib.Path(test_utils.TEST_DATA_DIR, test_utils.MP3_TEST_FILE),
+                full_path,
+            )
+            os.utime(full_path, (now, now))
+            now += 100
+
+        p.scan_for_updates(allow_prompt=False)
+        self.assertEqual(2, len(p.remaining_episodes()))
+
+        with create_test_db(self.root) as engine:
+            with Session(engine) as session:
+                p.save_to_db(session)
+                session.commit()
+
+            # Create a new show instance and load from database
+            p2 = podcast_show.PodcastShow(podcast_folder, podcast_show.P1)
+            self.assertEqual(0, len(p2.remaining_episodes()))
+
+            with Session(engine) as session:
+                found = p2.load_from_db(session)
+                self.assertTrue(found)
+
+            self.assertEqual(2, len(p2.remaining_episodes()))
+            # next_index should be computed from max episode index + 1
+            self.assertEqual(3, p2.next_index)
+
+            # Verify episode data matches
+            original_episodes = sorted(p.episodes, key=lambda e: e.index)
+            loaded_episodes = sorted(p2.episodes, key=lambda e: e.index)
+            for orig, loaded in zip(original_episodes, loaded_episodes):
+                self.assertEqual(orig.path, loaded.path)
+                self.assertEqual(orig.index, loaded.index)
+                self.assertEqual(orig.duration, loaded.duration)
+                self.assertEqual(orig.modification_time, loaded.modification_time)
+
+    def test_load_from_db_not_found(self) -> None:
+        """Test loading from database when show doesn't exist."""
+        podcast_folder = pathlib.Path(self.root, "nonexistent_podcast")
+        p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
+
+        with create_test_db(self.root) as engine:
+            with Session(engine) as session:
+                found = p.load_from_db(session)
+                self.assertFalse(found)
+
+    def test_save_to_db_empty_show(self) -> None:
+        """Test saving a show with no episodes."""
+        podcast_folder = pathlib.Path(self.root, "empty_podcast")
+        os.mkdir(podcast_folder)
+
+        p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
+        self.assertEqual(0, len(p.remaining_episodes()))
+
+        with create_test_db(self.root) as engine:
+            with Session(engine) as session:
+                p.save_to_db(session)
+                session.commit()
+
+            # Load and verify
+            p2 = podcast_show.PodcastShow(podcast_folder, podcast_show.P1)
+            with Session(engine) as session:
+                found = p2.load_from_db(session)
+                self.assertTrue(found)
+
+            self.assertEqual(0, len(p2.remaining_episodes()))
+            self.assertIsNone(p2.next_index)
+
+    def test_save_to_db_raises_if_already_exists(self) -> None:
+        """Test that save_to_db raises ValueError if the show already exists."""
+        podcast_folder = pathlib.Path(self.root, "podcast")
+        os.mkdir(podcast_folder)
+
+        p = podcast_show.PodcastShow(podcast_folder, podcast_show.P0)
+
+        with create_test_db(self.root) as engine:
+            with Session(engine) as session:
+                p.save_to_db(session)
+                session.commit()
+
+            with Session(engine) as session:
+                with self.assertRaises(ValueError):
+                    p.save_to_db(session)
 
 
 if __name__ == "__main__":

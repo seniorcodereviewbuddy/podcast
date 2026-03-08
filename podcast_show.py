@@ -2,8 +2,11 @@ import datetime
 import pathlib
 import typing
 
+from sqlalchemy.orm import Session
+
 import archive
 import full_podcast_episode
+import models
 import podcast_episode
 import podcast_preprocessing_base
 import user_input
@@ -96,6 +99,66 @@ class PodcastShow(object):
         f.write(str(len(self.episodes)) + "\n")
         for episode in self.episodes:
             episode.save(f)
+
+    def save_to_db(self, session: Session) -> None:
+        """Save this show and all its episodes to the database.
+
+        Intended for one-time migration from the text-based database.
+        Raises ValueError if the show already exists.
+
+        Args:
+            session: SQLAlchemy session to use for database operations.
+
+        Raises:
+            ValueError: If the show already exists in the database.
+        """
+        existing = (
+            session.query(models.ShowModel)
+            .filter_by(folder_name=self.podcast_folder.name)
+            .first()
+        )
+
+        if existing is not None:
+            raise ValueError(
+                f"Show '{self.podcast_folder.name}' already exists in database"
+            )
+
+        show_model = models.ShowModel(folder_name=self.podcast_folder.name)
+        session.add(show_model)
+        session.flush()  # Get the ID assigned
+
+        for episode in self.episodes:
+            show_model.episodes.append(episode.to_model(show_model.id))
+
+    def load_from_db(self, session: Session) -> bool:
+        """Load episodes from the database for this show.
+
+        Args:
+            session: SQLAlchemy session to use for database operations.
+
+        Returns:
+            True if the show was found in the database, False otherwise.
+        """
+        show_model = (
+            session.query(models.ShowModel)
+            .filter_by(folder_name=self.podcast_folder.name)
+            .first()
+        )
+
+        if show_model is None:
+            return False
+
+        self.episodes = [
+            podcast_episode.PodcastEpisode.from_model(ep) for ep in show_model.episodes
+        ]
+
+        # Compute next_index from loaded episodes
+        if self.episodes:
+            self.next_index = max(ep.index for ep in self.episodes) + 1
+        else:
+            self.next_index = None
+
+        return True
 
     def scan_for_updates(self, allow_prompt: bool = True) -> typing.List[pathlib.Path]:
         print("Scanning for Updates for %s" % (self.podcast_folder))

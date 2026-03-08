@@ -4,6 +4,7 @@ import typing
 
 import pyglet
 
+import models
 import time_helper
 
 
@@ -89,3 +90,37 @@ class PodcastEpisode(object):
         f.write(str(self.index) + "\n")
         f.write(str(self.duration) + "\n")
         f.write(str(self.modification_time) + "\n")
+
+    def to_model(self, show_id: int) -> models.EpisodeModel:
+        """Convert this episode to a SQLAlchemy model for database persistence.
+
+        Args:
+            show_id: The database ID of the parent show.
+
+        Returns:
+            An EpisodeModel instance ready to be added to a session.
+        """
+        return models.EpisodeModel(
+            show_id=show_id,
+            path=str(self.path),
+            episode_index=self.index,
+            duration=self.duration,
+            modification_time=self.modification_time,
+        )
+
+    @classmethod
+    def from_model(cls, episode_model: models.EpisodeModel) -> "PodcastEpisode":
+        """Create a PodcastEpisode from a SQLAlchemy model.
+
+        Args:
+            episode_model: The EpisodeModel from the database.
+
+        Returns:
+            A PodcastEpisode instance.
+        """
+        return cls(
+            path=pathlib.Path(episode_model.path),
+            index=episode_model.episode_index,
+            duration=episode_model.duration,
+            modification_time=episode_model.modification_time,
+        )
