@@ -15,7 +15,7 @@ repos:
         args: [--autofix]
     -   id: trailing-whitespace
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.12.0
+    rev: 26.5.1
     hooks:
     -  id: black
 -   repo: https://github.com/pycqa/flake8
@@ -24,20 +24,20 @@ repos:
     -   id: flake8
         exclude: ^alembic/
 -   repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+    rev: 9.0.1
     hooks:
     - id: isort
       name: isort (python)
       args: ["--profile", "black"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v2.3.1
     hooks:
     -   id: mypy
         args: ["--strict"]
         additional_dependencies: [alembic==1.14.0, mutagen==1.47.0, sqlalchemy==2.0.36]
         exclude: ^alembic/
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.11
+  rev: v0.16.6
   hooks:
     # Only use ruff for pep8-naming for now.
     # Consider using it to replace the other tooling later.
